@@ -29,7 +29,6 @@ I4 trim_first_2_bits(I4 data){
 I4 require_memory(I4 amount, I4 limit){
     // SEARCH THROUGHT GARBAGE COLLECTOR..
     return limit;
-    
 }
 
 ////////////////////////////////////////////////////////////////////////////////        CHECK FILE       ////
@@ -41,11 +40,10 @@ I4 epathy_check(){
     FILE *fp;
 
     // check is always at the beginning.. so we need to append or the file will be continuosly overwritten and could never exist anything...
-    fp=fopen(FILENAME,"ab");                                            // write or append mode creates if not existing
+    fp=fopen(FILENAME,"ab");                                            
     // CHECK IF THERE IS AT LEAST 1 (wll be always 4 per fwrite) BYTE IN THE FILE
     // IF THE FILE DOES NOT HAVE ANY BYTE, INITIALIZE THE FILE WITH A 4 BYTE INTEGER VALUE 0
-    // (the first 4 btes int in the file is the number of integers in the file, so is always given where to write the next 4byte int)->garbage collector-reusing of unused fragments will be created
-    // mooving pointer to end file
+    // moving pointer to end file
     fseek(fp, 0, SEEK_END);
     // get position of pointer
     bytes_count = ftell(fp);
@@ -69,10 +67,8 @@ I4 epathy_check(){
 // void print_whole_file(char* filepath , I4 count){
 //     I4 curren_integer = 0;
 //     FILE *fp =fopen(FILENAME,"rb");
-
 //     // check if everything good to create or open the file
 //     if(fp == NULL)  fprintf(stderr, "error opening file: %s #RUNNING %s at line # %d\n", FILENAME, __FILE__, __LINE__ - 1);
-
 //     // print everything
 //     for (size_t i = 0; i < (size_t)count; i++){
 //         fread(&curren_integer, sizeof (I4), 1, fp);
@@ -83,7 +79,6 @@ I4 epathy_check(){
 //     fclose(fp);
 //     printf("\n");
 // }
-
 
 ////////////////////////////////////////////////////////////////////////////////        SAVE IN FILE       ////
 void save(char *filepath , I4* newbuffer , I4 count ){
@@ -189,7 +184,7 @@ I4 add_node_to(I4* filebuffer , I4 limit, I4 path_begin , I4 new_node){
         if( is_END( filebuffer[i] ) ){
             if(filebuffer[i] == END_SKELETON){       
                 // if is End Of File (it h-appen-d often) right now:
-                // or there is somehow [END_SKELETON][END_SKELETON] --> could be an end of the brunch, and one element was canceled.
+                // or there is somehow [END_SKELETON][END_SKELETON] --> could be an end of the brunch, and one element was deleted.
                 // is no need to rewrite the end as a pointer
                 // the end is just replaced 1 position furder and a new data is written in this position
                 if( (limit-1)  == if_EOF(i, filebuffer , limit) ){
@@ -393,13 +388,13 @@ int main() {
     load_file(file_buffer,FILENAME,int32count);
 
     I4 newBrunch = NODE_SKELETON ;
-//  SOME INPUTS
+//  SOME INPUT
     new_data_or_nodes[0] = newBrunch;
     new_data_or_nodes[1] = newBrunch;
     new_data_or_nodes[2] = newBrunch;
     new_data_or_nodes[3] = END_SKELETON;
     I4 new_data_or_nodes_size = 4;
-//  END SOME INPUTS
+//  END SOME INPUT
 
     I4 begin = 0;
 
