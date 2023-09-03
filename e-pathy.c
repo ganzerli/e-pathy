@@ -142,7 +142,6 @@ I4 find_ENDs(I4* endsbuffer , I4 path_begin , I4* filebuffer){
 
             if(data_variable == END_SKELETON){
                 end = path_begin + i;
-                // OPS !!! i is not incremented...
                 endsbuffer[ends] = end;
                 printf("ends buffer[%u] = %u\n",ends, endsbuffer[ends]);
                 stop = 1;
