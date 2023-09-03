@@ -291,7 +291,7 @@ I4 init_node_in_path(I4* filebuffer, I4 path_begin, I4 filebuffer_count, I4 *END
 
     printf("\nNODE_SKELETON at position[%u] , initializing...\n",found_and_initialized);
     printf("in fielbuffer[%u] the data is: [%u]\n", found_and_initialized, filebuffer[found_and_initialized]);
-    printf("inititalizeing node.....\n\n");
+    printf("inititalizing node.....\n\n");
 
     // find space
     I4 count = 0;
