@@ -434,7 +434,7 @@ int main() {
  
         // begin is the index in filebuffer , filebuffer[begin]
 
-        // get form initialized node in filebuffer, the pointed address
+        // get from initialized node in filebuffer, the pointed address
         begin = get_node_begin(file_buffer , begin);
         // now is possible to search something in the path beginneng from filebuffer[begin]
     
