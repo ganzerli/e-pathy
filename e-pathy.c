@@ -440,7 +440,7 @@ int main() {
    // Oops.... 
    free(file_buffer);
    free(ends_buffer);
-   free(path_bufer);
+   free(path_buffer);
    free(new_data_or_nodes);
  
    return EXIT_SUCCESS;
