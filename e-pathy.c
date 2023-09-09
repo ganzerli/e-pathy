@@ -436,5 +436,12 @@ int main() {
         get_path(file_buffer, path_buffer , begin );
     
     }
+
+   // Oops.... 
+   free(file_buffer);
+   free(ends_buffer);
+   free(path_bufer);
+   free(new_data_or_nodes);
+ 
    return EXIT_SUCCESS;
 }
