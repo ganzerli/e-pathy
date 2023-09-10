@@ -157,8 +157,8 @@ I4 find_ENDs(I4* endsbuffer , I4 path_begin , I4* filebuffer){
 
 ////////////////////////////////////////////////////////////////////////////////        CHECK FOR SPACE RIGHT AFTER       ////
 // BEEING AT POSITION is_END()
-I4 if_EOF(I4 position , I4* filebuffer , I4 limit){
-    I4 result = SOMETHING_WENT_WRONG;
+I4 if_space_after(I4 position , I4* filebuffer , I4 limit){
+    I4 result = 0;
     //  if it is the END OF THE FILE
     if(position == limit -1) return limit-1;
     // BEEING AT POSITION is_END() if there is just place after it
@@ -187,7 +187,7 @@ I4 add_node_to(I4* filebuffer , I4 limit, I4 path_begin , I4 new_node){
                 // or there is somehow [END_SKELETON][END_SKELETON] --> could be an end of the brunch, and one element was deleted.
                 // is no need to rewrite the end as a pointer
                 // the end is just replaced 1 position furder and a new data is written in this position
-                if( (limit-1)  == if_EOF(i, filebuffer , limit) ){
+                if( (limit-1)  == if_space_after(i, filebuffer , limit) ){
 
                     //in check is the free position
                     filebuffer[i] = new_node;
@@ -442,6 +442,22 @@ int main() {
    free(ends_buffer);
    free(path_buffer);
    free(new_data_or_nodes);
- 
+
+
+   // remove
+   
+   //   if is node message you need to delete single data
+   //   get begin of node
+   //   find [data to delete]
+   //   run to end of brunch
+   //   copy the last data or node in [data to delete]
+   //   cover with an END_SKELETON
+   //   write the last END_SKELETON in garbage collector file
+   //   exiting the program order garbage collection file
+
+   // adding a node or data again in that brunch will just take the place back with if_space_after
+   // if there are more then 2 free places after one other the garbage collector can assign memory there.. in the case
+
+
    return EXIT_SUCCESS;
 }
