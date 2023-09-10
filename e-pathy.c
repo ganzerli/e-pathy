@@ -50,7 +50,7 @@ I4 epathy_check(){
     fclose(fp);
     // now last int has the position of the LAST BYTE of the file (not last integer, nor one of those used here)
     if(bytes_count  == 0){
-        // if no bytes in the file write a [END BRUNCH] as first 4 bytes integer
+        // if no bytes in the file write a [END BRANCH] as first 4 bytes integer
         fp=fopen(FILENAME,"ab");   
 
         fwrite(&end_skeleton, sizeof (I4), 1, fp);
@@ -126,7 +126,7 @@ I4 find_ENDs(I4* endsbuffer , I4 path_begin , I4* filebuffer){
     I4 check = 0;
 
     I4 data_variable = 0;
-    printf("\n   Finding ENDs from brunch [%d]\n\n", path_begin);
+    printf("\n   Finding ENDs from branch [%d]\n\n", path_begin);
 
     while (stop == 0){
         printf("[%u] -> %u \n",i, filebuffer[i]);
@@ -175,7 +175,7 @@ I4 add_node_to(I4* filebuffer , I4 limit, I4 path_begin , I4 new_node){
     I4 available_memory_at = 0;
     I4 END_points_to = 0;
 
-    printf("\n   Adding Node in brunch [%u]\n\n", path_begin );
+    printf("\n   Adding Node in branch [%u]\n\n", path_begin );
 
     // find a spot and write an uninitialized node
     while (stop == 0){
@@ -184,7 +184,7 @@ I4 add_node_to(I4* filebuffer , I4 limit, I4 path_begin , I4 new_node){
         if( is_END( filebuffer[i] ) ){
             if(filebuffer[i] == END_SKELETON){       
                 // if is End Of File (it h-appen-d often) right now:
-                // or there is somehow [END_SKELETON][END_SKELETON] --> could be an end of the brunch, and one element was deleted.
+                // or there is somehow [END_SKELETON][END_SKELETON] --> could be an end of the branch, and one element was deleted.
                 // is no need to rewrite the end as a pointer
                 // the end is just replaced 1 position furder and a new data is written in this position
                 if( (limit-1)  == if_space_after(i, filebuffer , limit) ){
@@ -249,9 +249,9 @@ I4 init_node_in_path(I4* filebuffer, I4 path_begin, I4 filebuffer_count, I4 *END
     printf("\n\n    init_node_in_path:\n\n");
     I4 found_and_initialized = 0;
     I4 i = path_begin;
-    I4 brunch_break = 0;
+    I4 branch_break = 0;
 
-    // if a brake of brunch found get continuation from ENDs array until last end
+    // if a brake of branch found get continuation from ENDs array until last end
     printf("ENDs[ends] = %u \n" , ENDs[ends]);
     while(i < ENDs[ends]){
 
@@ -264,13 +264,13 @@ I4 init_node_in_path(I4* filebuffer, I4 path_begin, I4 filebuffer_count, I4 *END
             break;
         }
         // if pointer found jump and continue searching from that position
-        if(i == ENDs[brunch_break] ){
-            printf("filebuffer[%u] ,  Ends[brunch_break] == %u \n" , i , ENDs[brunch_break]  );
+        if(i == ENDs[branch_break] ){
+            printf("filebuffer[%u] ,  Ends[branch_break] == %u \n" , i , ENDs[branch_break]  );
             // !!!! END_SKELETON BEGINS ALREADY WITH [00]..101010... SO THE POINTER IS ALREADY CLEAN
             // else the first 2 bits need to be trimmed
             //data_variable = trim_first_2_bits(filebuffer[i]);
-            brunch_break ++;
-            // if filebuffer[i] is a break it contains the pointer to cotinue reading the brunch
+            branch_break ++;
+            // if filebuffer[i] is a break it contains the pointer to cotinue reading the branch
             i = filebuffer[i];                                 
         }else{
             i++;
@@ -387,11 +387,11 @@ int main() {
     
     load_file(file_buffer,FILENAME,int32count);
 
-    I4 newBrunch = NODE_SKELETON ;
+    I4 newBranch = NODE_SKELETON ;
 //  SOME INPUT
-    new_data_or_nodes[0] = newBrunch;
-    new_data_or_nodes[1] = newBrunch;
-    new_data_or_nodes[2] = newBrunch;
+    new_data_or_nodes[0] = newBranch;
+    new_data_or_nodes[1] = newBranch;
+    new_data_or_nodes[2] = newBranch;
     new_data_or_nodes[3] = END_SKELETON;
     I4 new_data_or_nodes_size = 4;
 //  END SOME INPUT
@@ -409,7 +409,7 @@ int main() {
            int32count = add_node_to( file_buffer,
                                      int32count, 
                                      begin, 
-                                     newBrunch );
+                                     newBranch );
 
            save(FILENAME , file_buffer , int32count);
         }
@@ -450,13 +450,13 @@ int main() {
    //   if is node message you need to delete single data
    //   get begin of node
    //   find [data to delete]
-   //   run to end of brunch
+   //   run to end of branch
    //   copy the last data or node in [data to delete]
    //   cover with an END_SKELETON
    //   write the last END_SKELETON in garbage collector file
    //   exiting the program order garbage collection file
 
-   // adding a node or data again in that brunch will just take the place back with if_space_after
+   // adding a node or data again in that branch will just take the place back with if_space_after
    // if there are more then 2 free places after one other the garbage collector can assign memory there.. in the case
 
 
