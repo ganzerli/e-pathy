@@ -437,11 +437,12 @@ int main() {
     
     }
 
-   // Oops.... 
-   free(file_buffer);
-   free(ends_buffer);
-   free(path_buffer);
-   free(new_data_or_nodes);
+
+    // #free_heap
+    free(file_buffer);
+    free(ends_buffer);
+    free(path_buffer);
+    free(new_data_or_nodes);
 
 
    // remove
