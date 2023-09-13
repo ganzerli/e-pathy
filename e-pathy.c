@@ -64,30 +64,11 @@ I4 epathy_check(){
     return ints_count;
 }
 
-// void print_whole_file(char* filepath , I4 count){
-//     I4 curren_integer = 0;
-//     FILE *fp =fopen(FILENAME,"rb");
-//     // check if everything good to create or open the file
-//     if(fp == NULL)  fprintf(stderr, "error opening file: %s #RUNNING %s at line # %d\n", FILENAME, __FILE__, __LINE__ - 1);
-//     // print everything
-//     for (size_t i = 0; i < (size_t)count; i++){
-//         fread(&curren_integer, sizeof (I4), 1, fp);
-//         ////////////////////////////////
-//         printf("%u ", curren_integer);//
-//         ////////////////////////////////
-//     }
-//     fclose(fp);
-//     printf("\n");
-// }
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////     USEFUL FUNCTIONS FOR AN OUTER LIBRARY       ////////////////////////////////////////////////////
-
 I4 *sort_int32( I4 *data , size_t size ){
 
     unsigned int count = (unsigned int) size - 1;
-
     register I4 max = 0;
     register I4 index = 0;
 
@@ -109,9 +90,7 @@ I4 *sort_int32( I4 *data , size_t size ){
         count --;
     }
 }
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 ////////////////////////////////////////////////////////////////////////////////        SAVE IN FILE       ////
 void save(char *filepath , I4* newbuffer , I4 count ){
