@@ -80,6 +80,39 @@ I4 epathy_check(){
 //     printf("\n");
 // }
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////     USEFUL FUNCTIONS FOR AN OUTER LIBRARY       ////////////////////////////////////////////////////
+
+I4 *sort_int32( I4 *data , size_t size ){
+
+    unsigned int count = (unsigned int) size - 1;
+
+    register I4 max = 0;
+    register I4 index = 0;
+
+    while (count > 0){
+
+        for(I4 i = 0; i < count; i++){
+        
+            if (data[i] > max){
+                max = data[i];
+                index = i;
+            }
+        }
+        
+        data[index] = data[count];
+        index = 0;
+        data[count] = max;
+        max = 0;
+
+        count --;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 ////////////////////////////////////////////////////////////////////////////////        SAVE IN FILE       ////
 void save(char *filepath , I4* newbuffer , I4 count ){
 
@@ -184,7 +217,7 @@ I4 add_node_to(I4* filebuffer , I4 limit, I4 path_begin , I4 new_node){
         if( is_END( filebuffer[i] ) ){
             if(filebuffer[i] == END_SKELETON){       
                 // if is End Of File (it h-appen-d often) right now:
-                // or there is somehow [END_SKELETON][END_SKELETON] --> could be an end of the branch, and one element was deleted.
+                // or there is somehow [END_SKELETON][END_SKELETON] --> could be an end of branch, and one element was deleted.
                 // is no need to rewrite the end as a pointer
                 // the end is just replaced 1 position furder and a new data is written in this position
                 if( (limit-1)  == if_space_after(i, filebuffer , limit) ){
@@ -437,14 +470,13 @@ int main() {
     
     }
 
-
     // #free_heap
     free(file_buffer);
     free(ends_buffer);
     free(path_buffer);
     free(new_data_or_nodes);
 
-
+    
    // remove
    
    //   if is node message you need to delete single data
@@ -458,6 +490,26 @@ int main() {
 
    // adding a node or data again in that branch will just take the place back with if_space_after
    // if there are more then 2 free places after one other the garbage collector can assign memory there.. in the case
+
+
+    I4 sorting [] = {12,3,4,3,5,4,24,9,8,7,6,5,4,3,2,1,0,14,6,66,8,79,8,81,6,5,7,3,6,8,3,2,2,4,6,8,4,2,2,5,7,8,9,9,4,2,5,5,7,6,8,4,
+    212,98,8457,58789,5,6,8793,5176562,5745,7,9,46,24557,58,9456,26,5,74585,6,6565,6,385,8,56,3748,4562345,249,58078468,6256,5756846,
+    51,4526,48,4747,245647,6545,627,458,56,4,5152,5,45,6,7,5,45,4526,7,457,68,45,61,2,52,462,45,74,475,2,9847,5,2874,594,8,6720641,7,
+    4524,579,684,5,79865513,586,50,702360,65,9702,36,5230,516,298749,87,6,2451,98,4756,498,72,8246,207117,4607,4962,4651,265,9,82641865,
+    14,6529,87,6965194,659,26,4641962,98,65,298,652,98652,46,29,486,52,86,526,59,84,65,9,865165,92,86,598,65,62,984,7519,874,70,23652,
+    315,162,987,4987,6,245,198,475,649,8728,24,620,7017,460,7496,24,65026,598,264189,84752,984,75,28,745,9486,720,641,74,524,5796,845,
+    798,655135,86517123,606,5965,146,52,98,7696,509,465,926,464,962,986,529,8652,98,652,462,94,865,28,65,2,65,984,659,86516,59,286,59,
+    865,62,98475,9,874,98,47,5,29,8475,2874,594,867,2064,17,45,24,57,968,45,798,65,503,58,650,702,365,9264,640,962,986,529,8652,986,52,
+    462,948,652,86,5265,984,659,8651,6592,86,59,865,6298,47,5098,746165,971236,52,305,162,987,498,762,45,19,847,56,498,7282,46,207117,
+    460,74,96,24,6502,65,98,26,408,651,46529,876,96519,4,98,4,56,4,52,7,698,0,456,62,4646,469,6,2,6,457,79,680,8,67,541,524,7459,7858};
+
+
+    size_t zise = sizeof sorting / sizeof (I4);
+    sort_int32(sorting , zise);
+    
+    for( size_t i = 0; i < zise; i++ ){
+        printf("%u," , sorting[i]);
+    }
 
 
    return EXIT_SUCCESS;
