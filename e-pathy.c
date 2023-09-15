@@ -15,7 +15,7 @@ typedef u_int32_t  I4;
 
 struct scavage{
     I4 index;
-    I4 number;
+    I4 count;
 };
 
 ////////////////////////////////////////////////////////////////////////////////        IS END       ////
@@ -136,31 +136,61 @@ I4 garbage_check(){
 
 ////////////////////////////////////////////////////////////////////////////////        DROP DATA       ////
 I4 garbage_trash(I4 index){
-    I4 content = 0;
 
     I4 ints_count = 0;                     
     I4 bytes_count = 0;
-
     FILE *fp;
-    fp=fopen(GARBAGE,"ab");                                            
+
+    fp=fopen(GARBAGE,"ab");      
+
     fseek(fp, 0, SEEK_END);
     bytes_count = ftell(fp);
+    ints_count = bytes_count / 4;
 
     fwrite(&index, sizeof (I4), 1, fp);
     ints_count++;   
 
     fclose(fp);
-    ints_count = bytes_count / 4;
-    
     return ints_count;
-
-    return content;
 }
 
-void garbage_get_compost(struct scavage * scavaging){
-    
+
+////////////////////////////////////////////////////////////////////////////////       GET SIZE AND POSITION OF DELETED ITEMS       ////
+I4 garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
+
+    I4 result = 0;
+    I4 size_found = 0;
+    I4 current_integer = 0;
+    I4 last_integer = SOMETHING_WENT_WRONG;
     scavaging->index = 0;
-    scavaging->number = 0;
+    scavaging->count = 0;
+
+    FILE *fp =fopen(GARBAGE,"rb");
+    if(fp == NULL)  fprintf(stderr, "error opening file: %s #RUNNING %s at line # %d\n", GARBAGE, __FILE__, __LINE__ - 1);
+
+    // having the file sorted..
+    // look if there is at least size_needed +1    
+    for (I4 i = 0; i < I4count; i++){
+        fread(&current_integer, sizeof (I4), 1, fp);
+        
+        if(current_integer == last_integer +1){
+            last_integer = current_integer;
+            size_found++;
+        }else{
+            size_found = 0;
+        }
+
+        if(size_found > size_needed){
+            scavaging->index = current_integer;
+            scavaging->count = size_found;
+
+            result = 1;
+            i = I4count;
+            break;
+        }
+    }
+    fclose(fp);
+
 
 }
 
@@ -461,7 +491,7 @@ I4 delete(I4* file_buffer , I4 i_end , I4 i_ndex){
     file_buffer[ i_end - 1 ] = END_SKELETON;
 
     // Write free space in garbage collection
-    // garbage_trash(i_end);
+    garbage_trash(i_end);
 
     return result;
 }
@@ -620,9 +650,6 @@ int main() {
 
 
     struct scavage scavaging;
-    scavaging.index = 0;
-    scavaging.number = 1;
-    
 
     printf("\nresult: %u \n", tempI4);
 
