@@ -18,6 +18,10 @@ struct scavage{
     I4 count;
 };
 
+void line(){
+    printf("\n");
+}
+
 ////////////////////////////////////////////////////////////////////////////////        IS END       ////
 unsigned int is_END(I4 num){
    return  ( 0b00111111111111111111111111111111 | num ) == 0b00111111111111111111111111111111;
@@ -84,7 +88,7 @@ I4 epathy_check(){
 
 I4 *sort_int32( I4 *data , size_t size ){
 
-    unsigned int count = (unsigned int) size - 1;
+    unsigned int count = (unsigned int) size;
 
     register I4 max = 0;
     register I4 index = 0;
@@ -134,26 +138,38 @@ I4 garbage_check(){
 }
 
 
-////////////////////////////////////////////////////////////////////////////////        DROP DATA       ////
-I4 garbage_trash(I4 index){
+////////////////////////////////////////////////////////////////////////////////        DROP DATA IN THE THRASH      ////
+I4 garbage_drop_in_trash(I4 index){
 
-    I4 ints_count = 0;                     
-    I4 bytes_count = 0;
     FILE *fp;
+    I4 idnex = index;
+
+    printf("\n\nindex should be: %u" , idnex);
 
     fp=fopen(GARBAGE,"ab");      
 
-    fseek(fp, 0, SEEK_END);
-    bytes_count = ftell(fp);
-    ints_count = bytes_count / 4;
-
-    fwrite(&index, sizeof (I4), 1, fp);
-    ints_count++;   
+    fwrite(&idnex, sizeof (I4), 1, fp); 
 
     fclose(fp);
-    return ints_count;
+    
 }
 
+////////////////////////////////////////////////////////////////////////////////        TAKE TRASH BIN AND TURN IT UPSIDE DOWN       ////
+void garbage_turn_bin(I4 size){
+
+    FILE *fp=fopen(GARBAGE,"rb");      
+    I4 current_integer = 0;
+
+    printf("\n  Turning the trash bin...\n");
+
+    for (I4 i = 0; i < size; i++){
+        fread(&current_integer, sizeof (I4), 1, fp);
+        printf("%u ", current_integer);
+    }
+    printf("\n");
+    fclose(fp);
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////       GET SIZE AND POSITION OF DELETED ITEMS       ////
 I4 garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
@@ -194,12 +210,33 @@ I4 garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////       SORT GARBAGE FILE       ////
+I4 garbage_sort(size_t size){
 
+    I4 *empty_trash_bin = malloc( sizeof(I4) * 256);
+    I4 current_integer = 0;
 
+    FILE *fp = fopen(GARBAGE,"rb");
+    if(fp == NULL) return 0;
 
+    for (size_t i = 0; i < size; i++){
+        fread(&current_integer, sizeof (I4), 1, fp);
+        empty_trash_bin[i] = current_integer;
+    }
+    fclose(fp);
 
+    sort_int32(empty_trash_bin , size);
 
+    fp = fopen(GARBAGE ,"wb");
+    for (size_t i = 0; i < size; i++){
+        current_integer = empty_trash_bin[i];
+        fwrite(&current_integer, sizeof (I4), 1, fp);
+    }
+
+    return empty_trash_bin[size];
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////   END GARBAGE COLLECTION LIBRARY  ///////////////////////////////////
 
 
 
@@ -483,14 +520,24 @@ I4 delete(I4* file_buffer , I4 i_end , I4 i_ndex){
 
     I4 data = trim_first_2_bits(file_buffer[i_ndex]);
 
-    // before taking any action consider always sponsoring or voluntaring in the diacony of berlin. they decleared on overflowing of people with serious handicaps. thanks.
     printf("deleted: %u ; ( data + type %u ) - type %u = data %u " , data , file_buffer[i_ndex] , DATA_SKELETON , data);
     file_buffer[ i_ndex ] = file_buffer[ i_end - 1 ];
     file_buffer[ i_end - 1 ] = END_SKELETON;
 
     // Write free space in garbage collection
-    garbage_trash(i_end);
+    garbage_drop_in_trash(i_end);
+    garbage_drop_in_trash(1);
+    garbage_drop_in_trash(3);
+    garbage_drop_in_trash(0);
+    garbage_drop_in_trash(4);
+    garbage_drop_in_trash(2);
+    garbage_drop_in_trash(8);
+    garbage_drop_in_trash(7);
 
+
+    printf("\n\nfree space should be: %u" , i_end);
+
+    
     return result;
 }
 
@@ -564,7 +611,7 @@ int main() {
         }
 
         // find and init first uninitialized node [NODE_SKELETON] found in path: begin
-        if( 1 ){
+        if( 0 ){
             int32count = init_node_in_path( file_buffer, 
                                             begin, 
                                             int32count,
@@ -630,21 +677,19 @@ int main() {
     // printing anyways
     get_path(file_buffer, path_buffer , begin );
 
-    // in this case path begin 7 , data is in 10
-
-
     // when no file or empty format for use
     tempI4 = garbage_check();
     int32count = tempI4;
     filesize = (tempI4 * 4);
 
-
     // PRINT USEFUL INFO
     printf("There are currently %d 4-bytes INTEGERS in the file \n", int32count );
     printf("Current filesize: %d bytes\n", filesize );
 
-
     tempI4 = delete(file_buffer , ends_buffer[n_breaks-1] , 5 );
+
+    // when something deleted garbage collection is to increase
+    if(tempI4) int32count++;
 
     struct scavage scavaging;
     garbage_get_compost( &scavaging , 3 , tempI4);
@@ -652,6 +697,9 @@ int main() {
     printf("\nindex:%u , count:%u \n" , scavaging.index , scavaging.count);
     printf("\nresult: %u \n", tempI4);
 
+    garbage_turn_bin(int32count);
+
+    garbage_sort(int32count);
 
     // printing anyways
     get_path(file_buffer, path_buffer , begin );
