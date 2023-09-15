@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #define FILENAME "file"
+#define GARBAGE "thrash"
 #define _1GB 1073741823
 
 #define SOMETHING_WENT_WRONG    0b11111111111111111111111111111111
@@ -10,11 +11,24 @@
 #define END_SKELETON            0b00000000000000000000000000000000
 
  // 4 bytes integer
-typedef u_int32_t  I4;                                                                             
+typedef u_int32_t  I4;     
+
+struct scavage{
+    I4 index;
+    I4 number;
+};
 
 ////////////////////////////////////////////////////////////////////////////////        IS END       ////
-I4 is_END(I4 num){
+unsigned int is_END(I4 num){
    return  ( 0b00111111111111111111111111111111 | num ) == 0b00111111111111111111111111111111;
+}
+////////////////////////////////////////////////////////////////////////////////        IS NODE       ////
+unsigned int is_NODE(I4 num){
+   return  ( 0b00111111111111111111111111111111 | num ) == 0b11111111111111111111111111111111;
+}
+////////////////////////////////////////////////////////////////////////////////        IS DATA      ////
+unsigned int is_DATA(I4 num){
+   return  ( 0b00111111111111111111111111111111 | num ) == 0b01111111111111111111111111111111;
 }
 
 ////////////////////////////////////////////////////////////////////////////////        TRIM FIRST 2 BITS       ////
@@ -64,11 +78,14 @@ I4 epathy_check(){
     return ints_count;
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////     USEFUL FUNCTIONS FOR AN OUTER LIBRARY       ////////////////////////////////////////////////////
+
 I4 *sort_int32( I4 *data , size_t size ){
 
     unsigned int count = (unsigned int) size - 1;
+
     register I4 max = 0;
     register I4 index = 0;
 
@@ -90,7 +107,73 @@ I4 *sort_int32( I4 *data , size_t size ){
         count --;
     }
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                                                                        /*    GARBAGE   */
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////        CHECK GARBAGE FILE       ////
+// CHECKS IF FILE EXISTS, AND RETURNS NUMBER OF 32BITS INT IN THE FILE
+I4 garbage_check(){
+
+    I4 ints_count = 0;                     
+    I4 bytes_count = 0;
+
+    FILE *fp;
+    fp=fopen(GARBAGE,"ab");                                            
+    fseek(fp, 0, SEEK_END);
+    bytes_count = ftell(fp);
+    fclose(fp);
+    ints_count = bytes_count / 4;
+    
+    return ints_count;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////        DROP DATA       ////
+I4 garbage_trash(I4 index){
+    I4 content = 0;
+
+    I4 ints_count = 0;                     
+    I4 bytes_count = 0;
+
+    FILE *fp;
+    fp=fopen(GARBAGE,"ab");                                            
+    fseek(fp, 0, SEEK_END);
+    bytes_count = ftell(fp);
+
+    fwrite(&index, sizeof (I4), 1, fp);
+    ints_count++;   
+
+    fclose(fp);
+    ints_count = bytes_count / 4;
+    
+    return ints_count;
+
+    return content;
+}
+
+void garbage_get_compost(struct scavage * scavaging){
+    
+    scavaging->index = 0;
+    scavaging->number = 0;
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////        SAVE IN FILE       ////
 void save(char *filepath , I4* newbuffer , I4 count ){
@@ -129,8 +212,8 @@ void load_file(I4* buffer, char* filename , I4 count){
 }
                                                                                 
 ////////////////////////////////////////////////////////////////////////////////        FIND ENDS       ////
-I4 find_ENDs(I4* endsbuffer , I4 path_begin , I4* filebuffer){
-    I4 ends = 0;
+I4 find_ENDs( I4* filebuffer , I4* endsbuffer , I4 path_begin ){
+    I4 ends = 1;
     I4 end = 0;
 
     I4 i = path_begin;
@@ -148,9 +231,9 @@ I4 find_ENDs(I4* endsbuffer , I4 path_begin , I4* filebuffer){
             printf("END at filebuffer[%u] brings to...: [%u] \n", i , data_variable);
 
             if(data_variable == END_SKELETON){
-                end = path_begin + i;
-                endsbuffer[ends] = end;
-                printf("ends buffer[%u] = %u\n",ends, endsbuffer[ends]);
+               // end = path_begin + i;
+                endsbuffer[ends-1] = i;
+                printf("ends buffer[%u] = %u\n",ends - 1, endsbuffer[ends]);
                 stop = 1;
                 break;
             }else{
@@ -264,8 +347,8 @@ I4 init_node_in_path(I4* filebuffer, I4 path_begin, I4 filebuffer_count, I4 *END
     I4 branch_break = 0;
 
     // if a brake of branch found get continuation from ENDs array until last end
-    printf("ENDs[ends] = %u \n" , ENDs[ends]);
-    while(i < ENDs[ends]){
+    printf("ENDs[ends] = %u \n" , ENDs[ends-1]);
+    while(i < ENDs[ends-1]){
 
         printf("filebuffer[%u] = %u\n", i , filebuffer[i]);
         // when uninitialized node found
@@ -364,6 +447,26 @@ I4 get_path( I4* filebuffer, I4* path_buffer, I4 node_begin){
     return count;
 }
 
+
+I4 delete(I4* file_buffer , I4 i_end , I4 i_ndex){
+
+    I4 result = is_DATA(file_buffer[i_ndex]);
+    if(!result) return result;
+
+    I4 data = trim_first_2_bits(file_buffer[i_ndex]);
+
+    // before taking any action consider always sponsoring or voluntaring in the diacony of berlin. they decleared on overflowing of people with serious handicaps. thanks.
+    printf("deleted: %u ; ( data + type %u ) - type %u = data %u " , data , file_buffer[i_ndex] , DATA_SKELETON , data);
+    file_buffer[ i_ndex ] = file_buffer[ i_end - 1 ];
+    file_buffer[ i_end - 1 ] = END_SKELETON;
+
+    // Write free space in garbage collection
+    // garbage_trash(i_end);
+
+    return result;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////        MAIN       ////
 int main() {
 
@@ -399,25 +502,28 @@ int main() {
     
     load_file(file_buffer,FILENAME,int32count);
 
-    I4 newBranch = NODE_SKELETON ;
+    I4 newBranch =  NODE_SKELETON ;
+    I4 newData =    0b01010101010101010101010101010101;
+
 //  SOME INPUT
     new_data_or_nodes[0] = newBranch;
     new_data_or_nodes[1] = newBranch;
     new_data_or_nodes[2] = newBranch;
-    new_data_or_nodes[3] = END_SKELETON;
-    I4 new_data_or_nodes_size = 4;
+    new_data_or_nodes[3] = newData;
+    new_data_or_nodes[4] = END_SKELETON;
+    I4 new_data_or_nodes_size = 5;
 //  END SOME INPUT
 
     I4 begin = 0;
 
     // needed to know when to jump where
-    I4 n_breaks = find_ENDs(ends_buffer , begin , file_buffer);
+    I4 n_breaks = find_ENDs( file_buffer , ends_buffer , begin );
 
     // sometimes you cannot be safe
     if(int32count > 0){
 
         // add node to path: begin
-        if( 1 ){
+        if( 0 ){
            int32count = add_node_to( file_buffer,
                                      int32count, 
                                      begin, 
@@ -448,13 +554,6 @@ int main() {
         get_path(file_buffer, path_buffer , begin );
     
     }
-
-    // #free_heap
-    free(file_buffer);
-    free(ends_buffer);
-    free(path_buffer);
-    free(new_data_or_nodes);
-
     
    // remove
    
@@ -471,24 +570,73 @@ int main() {
    // if there are more then 2 free places after one other the garbage collector can assign memory there.. in the case
 
 
-    I4 sorting [] = {12,3,4,3,5,4,24,9,8,7,6,5,4,3,2,1,0,14,6,66,8,79,8,81,6,5,7,3,6,8,3,2,2,4,6,8,4,2,2,5,7,8,9,9,4,2,5,5,7,6,8,4,
+    I4 sorting [] = {12,3,4,3,5,4,24,9,8,7,6,5,4,3,2,1,1,14,6,66,8,79,8,81,6,5,7,3,6,8,3,2,2,4,6,8,4,2,2,5,7,8,9,9,4,2,5,5,7,6,8,4,1,
     212,98,8457,58789,5,6,8793,5176562,5745,7,9,46,24557,58,9456,26,5,74585,6,6565,6,385,8,56,3748,4562345,249,58078468,6256,5756846,
     51,4526,48,4747,245647,6545,627,458,56,4,5152,5,45,6,7,5,45,4526,7,457,68,45,61,2,52,462,45,74,475,2,9847,5,2874,594,8,6720641,7,
     4524,579,684,5,79865513,586,50,702360,65,9702,36,5230,516,298749,87,6,2451,98,4756,498,72,8246,207117,4607,4962,4651,265,9,82641865,
     14,6529,87,6965194,659,26,4641962,98,65,298,652,98652,46,29,486,52,86,526,59,84,65,9,865165,92,86,598,65,62,984,7519,874,70,23652,
-    315,162,987,4987,6,245,198,475,649,8728,24,620,7017,460,7496,24,65026,598,264189,84752,984,75,28,745,9486,720,641,74,524,5796,845,
-    798,655135,86517123,606,5965,146,52,98,7696,509,465,926,464,962,986,529,8652,98,652,462,94,865,28,65,2,65,984,659,86516,59,286,59,
-    865,62,98475,9,874,98,47,5,29,8475,2874,594,867,2064,17,45,24,57,968,45,798,65,503,58,650,702,365,9264,640,962,986,529,8652,986,52,
-    462,948,652,86,5265,984,659,8651,6592,86,59,865,6298,47,5098,746165,971236,52,305,162,987,498,762,45,19,847,56,498,7282,46,207117,
-    460,74,96,24,6502,65,98,26,408,651,46529,876,96519,4,98,4,56,4,52,7,698,0,456,62,4646,469,6,2,6,457,79,680,8,67,541,524,7459,7858};
+    315,162,987,4987,6,245,198,475,649,8728,24,620,7017,460,7496,24,65026,598,264189,84752,984,75,28,745,9486,720,641,74,524,5796,845};
 
 
     size_t zise = sizeof sorting / sizeof (I4);
     sort_int32(sorting , zise);
     
     for( size_t i = 0; i < zise; i++ ){
-        printf("%u," , sorting[i]);
+
+        printf("%u," , sorting[i] - 1 );
+    
     }
+
+
+
+
+    // assuming branch at 0 is initialized
+    // search wht is in node position 0
+    begin = 0;
+    begin = get_node_begin(file_buffer , begin);
+
+    // get ends starting from the NEW branch begin
+    n_breaks = find_ENDs(file_buffer , ends_buffer , begin);
+
+    // printing anyways
+    get_path(file_buffer, path_buffer , begin );
+
+    // in this case path begin 7 , data is in 10
+
+
+    // when no file or empty format for use
+    tempI4 = garbage_check();
+    int32count = tempI4;
+    filesize = (tempI4 * 4);
+
+
+    // PRINT USEFUL INFO
+    printf("There are currently %d 4-bytes INTEGERS in the file \n", int32count );
+    printf("Current filesize: %d bytes\n", filesize );
+
+
+    tempI4 = delete(file_buffer , ends_buffer[n_breaks-1] , 10 );
+
+
+
+    struct scavage scavaging;
+    scavaging.index = 0;
+    scavaging.number = 1;
+    
+
+    printf("\nresult: %u \n", tempI4);
+
+
+    // printing anyways
+    get_path(file_buffer, path_buffer , begin );
+
+
+    // #free_heap
+    free(file_buffer);
+    free(ends_buffer);
+    free(path_buffer);
+    free(new_data_or_nodes);
+
 
 
    return EXIT_SUCCESS;
