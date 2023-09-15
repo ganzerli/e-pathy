@@ -191,9 +191,7 @@ I4 garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
     }
     fclose(fp);
 
-
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -540,8 +538,11 @@ int main() {
     new_data_or_nodes[1] = newBranch;
     new_data_or_nodes[2] = newBranch;
     new_data_or_nodes[3] = newData;
-    new_data_or_nodes[4] = END_SKELETON;
-    I4 new_data_or_nodes_size = 5;
+    new_data_or_nodes[4] = newData;
+    new_data_or_nodes[5] = newData;
+    new_data_or_nodes[6] = newData;
+    new_data_or_nodes[7] = END_SKELETON;
+    I4 new_data_or_nodes_size = 8;
 //  END SOME INPUT
 
     I4 begin = 0;
@@ -563,7 +564,7 @@ int main() {
         }
 
         // find and init first uninitialized node [NODE_SKELETON] found in path: begin
-        if( 0 ){
+        if( 1 ){
             int32count = init_node_in_path( file_buffer, 
                                             begin, 
                                             int32count,
@@ -618,8 +619,6 @@ int main() {
     }
 
 
-
-
     // assuming branch at 0 is initialized
     // search wht is in node position 0
     begin = 0;
@@ -645,12 +644,12 @@ int main() {
     printf("Current filesize: %d bytes\n", filesize );
 
 
-    tempI4 = delete(file_buffer , ends_buffer[n_breaks-1] , 10 );
-
-
+    tempI4 = delete(file_buffer , ends_buffer[n_breaks-1] , 5 );
 
     struct scavage scavaging;
+    garbage_get_compost( &scavaging , 3 , tempI4);
 
+    printf("\nindex:%u , count:%u \n" , scavaging.index , scavaging.count);
     printf("\nresult: %u \n", tempI4);
 
 
