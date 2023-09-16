@@ -88,7 +88,7 @@ I4 epathy_check(){
 
 I4 *sort_int32( I4 *data , size_t size ){
 
-    unsigned int count = (unsigned int) size;
+    unsigned int count = (unsigned int) size -1;
 
     register I4 max = 0;
     register I4 index = 0;
@@ -97,7 +97,7 @@ I4 *sort_int32( I4 *data , size_t size ){
 
         for(I4 i = 0; i < count; i++){
         
-            if (data[i] > max){
+            if (data[i] >= max){
                 max = data[i];
                 index = i;
             }
@@ -160,7 +160,7 @@ void garbage_turn_bin(I4 size){
     FILE *fp=fopen(GARBAGE,"rb");      
     I4 current_integer = 0;
 
-    printf("\n  Turning the trash bin...\n");
+    printf("\n  Turning the trhash bin...\n");
 
     for (I4 i = 0; i < size; i++){
         fread(&current_integer, sizeof (I4), 1, fp);
@@ -526,14 +526,6 @@ I4 delete(I4* file_buffer , I4 i_end , I4 i_ndex){
 
     // Write free space in garbage collection
     garbage_drop_in_trash(i_end);
-    garbage_drop_in_trash(1);
-    garbage_drop_in_trash(3);
-    garbage_drop_in_trash(0);
-    garbage_drop_in_trash(4);
-    garbage_drop_in_trash(2);
-    garbage_drop_in_trash(8);
-    garbage_drop_in_trash(7);
-
 
     printf("\n\nfree space should be: %u" , i_end);
 
@@ -648,12 +640,12 @@ int main() {
    // if there are more then 2 free places after one other the garbage collector can assign memory there.. in the case
 
 
-    I4 sorting [] = {12,3,4,3,5,4,24,9,8,7,6,5,4,3,2,1,1,14,6,66,8,79,8,81,6,5,7,3,6,8,3,2,2,4,6,8,4,2,2,5,7,8,9,9,4,2,5,5,7,6,8,4,1,
+    I4 sorting [] = {12,3,4,3,5,4,24,9,8,7,6,5,4,3,2,1,1,11,14,6,66,8,79,8,81,6,5,7,3,6,8,3,2,2,4,6,8,4,2,2,5,7,8,9,9,4,2,5,5,7,6,8,4,1,
     212,98,8457,58789,5,6,8793,5176562,5745,7,9,46,24557,58,9456,26,5,74585,6,6565,6,385,8,56,3748,4562345,249,58078468,6256,5756846,
     51,4526,48,4747,245647,6545,627,458,56,4,5152,5,45,6,7,5,45,4526,7,457,68,45,61,2,52,462,45,74,475,2,9847,5,2874,594,8,6720641,7,
     4524,579,684,5,79865513,586,50,702360,65,9702,36,5230,516,298749,87,6,2451,98,4756,498,72,8246,207117,4607,4962,4651,265,9,82641865,
     14,6529,87,6965194,659,26,4641962,98,65,298,652,98652,46,29,486,52,86,526,59,84,65,9,865165,92,86,598,65,62,984,7519,874,70,23652,
-    315,162,987,4987,6,245,198,475,649,8728,24,620,7017,460,7496,24,65026,598,264189,84752,984,75,28,745,9486,720,641,74,524,5796,845};
+    315,162,987,4987,6,245,198,475,649,8728,24,620,7017,460,7496,24,65026,598,264189,84752,984,75,28,745,9486,720,641,74,524,5796,845,6};
 
 
     size_t zise = sizeof sorting / sizeof (I4);
@@ -661,7 +653,7 @@ int main() {
     
     for( size_t i = 0; i < zise; i++ ){
 
-        printf("%u," , sorting[i] - 1 );
+        printf("%u," , sorting[i] );
     
     }
 
@@ -679,14 +671,18 @@ int main() {
 
     // when no file or empty format for use
     tempI4 = garbage_check();
-    int32count = tempI4;
+    I4 garbage32count = tempI4;
     filesize = (tempI4 * 4);
 
     // PRINT USEFUL INFO
-    printf("There are currently %d 4-bytes INTEGERS in the file \n", int32count );
+    printf("There are currently %d 4-bytes INTEGERS in the file \n", garbage32count );
     printf("Current filesize: %d bytes\n", filesize );
 
-    tempI4 = delete(file_buffer , ends_buffer[n_breaks-1] , 5 );
+    // tempI4 = delete(file_buffer , ends_buffer[n_breaks-1] , 8 );
+    // if(!tempI4) printf("filebuffer[%u] IS NOT A DATA, IS A NODE -->", 8);
+    // save(FILENAME , file_buffer , int32count);
+
+
 
     // when something deleted garbage collection is to increase
     if(tempI4) int32count++;
@@ -703,6 +699,9 @@ int main() {
 
     // printing anyways
     get_path(file_buffer, path_buffer , begin );
+
+
+
 
 
     // #free_heap
