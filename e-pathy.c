@@ -86,23 +86,20 @@ I4 epathy_check(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////     USEFUL FUNCTIONS FOR AN OUTER LIBRARY       ////////////////////////////////////////////////////
 
-I4 *sort_int32( I4 *data , size_t size ){
+void sort_int32( I4 *data , size_t size ){
 
     unsigned int count = (unsigned int) size -1;
-
     register I4 max = 0;
     register I4 index = 0;
 
     while (count > 0){
 
         for(I4 i = 0; i < count; i++){
-        
             if (data[i] >= max){
                 max = data[i];
                 index = i;
             }
         }
-        
         data[index] = data[count];
         index = 0;
         data[count] = max;
@@ -113,12 +110,10 @@ I4 *sort_int32( I4 *data , size_t size ){
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
+//  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  // 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                                                                         /*    GARBAGE   */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 ////////////////////////////////////////////////////////////////////////////////        CHECK GARBAGE FILE       ////
 // CHECKS IF FILE EXISTS, AND RETURNS NUMBER OF 32BITS INT IN THE FILE
@@ -126,43 +121,40 @@ I4 garbage_check(){
 
     I4 ints_count = 0;                     
     I4 bytes_count = 0;
-
     FILE *fp;
+
     fp=fopen(GARBAGE,"ab");                                            
     fseek(fp, 0, SEEK_END);
     bytes_count = ftell(fp);
     fclose(fp);
-    ints_count = bytes_count / 4;
     
+    ints_count = bytes_count / 4;
     return ints_count;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////        DROP DATA IN THE THRASH      ////
 I4 garbage_drop_in_trash(I4 index){
 
+    printf("\n\n    DROPPING IN THRASH  ");
     FILE *fp;
     I4 idnex = index;
 
-    printf("\n\nindex should be: %u" , idnex);
-
     fp=fopen(GARBAGE,"ab");      
-
     fwrite(&idnex, sizeof (I4), 1, fp); 
-
+    printf("\n written in garbage collector: %u" , idnex);
     fclose(fp);
     
 }
 
 ////////////////////////////////////////////////////////////////////////////////        TAKE TRASH BIN AND TURN IT UPSIDE DOWN       ////
-void garbage_turn_bin(I4 size){
+void garbage_turn_bin(I4 zise){
 
     FILE *fp=fopen(GARBAGE,"rb");      
     I4 current_integer = 0;
 
     printf("\n  Turning the trhash bin...\n");
 
-    for (I4 i = 0; i < size; i++){
+    for (I4 i = 0; i < zise; i++){
         fread(&current_integer, sizeof (I4), 1, fp);
         printf("%u ", current_integer);
     }
@@ -177,7 +169,7 @@ I4 garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
     I4 result = 0;
     I4 size_found = 0;
     I4 current_integer = 0;
-    I4 last_integer = SOMETHING_WENT_WRONG;
+    I4 last_integer = SOMETHING_WENT_WRONG - 1;
     scavaging->index = 0;
     scavaging->count = 0;
 
@@ -194,16 +186,21 @@ I4 garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
             size_found++;
         }else{
             size_found = 0;
+            last_integer = current_integer;
         }
 
+        // a need to set a data not at end of file, is that that position is free, but then there is also space for a [END]
+        // assuming  that the size needed is only 1, [there][and also an end] (probably to avoid too much jumps is better to have big blocks of data)
         if(size_found > size_needed){
             scavaging->index = current_integer;
             scavaging->count = size_found;
 
-            result = 1;
+            // in that case i is : taht END that should remain: asked 3 ....[1][2][3][END] or ...[0][1][2][END]
+            result = i;
             i = I4count;
             break;
         }
+         size_found = 0;
     }
     fclose(fp);
 
@@ -213,31 +210,50 @@ I4 garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
 ////////////////////////////////////////////////////////////////////////////////       SORT GARBAGE FILE       ////
 I4 garbage_sort(size_t size){
 
-    I4 *empty_trash_bin = malloc( sizeof(I4) * 256);
+    printf("\n\n    sorting    -> %u elements \n" , size);
+    if(size == 0)  return 0;                                                    // or it crashes...
+
+    I4 *empty_trash_bin = malloc(256 * sizeof (I4));
+
     I4 current_integer = 0;
 
     FILE *fp = fopen(GARBAGE,"rb");
     if(fp == NULL) return 0;
-
+    line();
+    printf("rpint sorting: current integer -> %u" , current_integer);
     for (size_t i = 0; i < size; i++){
         fread(&current_integer, sizeof (I4), 1, fp);
+    
+    printf("\nreading from file: current integer -> %u" , current_integer);
+    line();
+
         empty_trash_bin[i] = current_integer;
+    
+    printf("empty_thrash_bin[%u] as current integer", empty_trash_bin[i]);
+
     }
     fclose(fp);
 
     sort_int32(empty_trash_bin , size);
 
     fp = fopen(GARBAGE ,"wb");
+
     for (size_t i = 0; i < size; i++){
         current_integer = empty_trash_bin[i];
         fwrite(&current_integer, sizeof (I4), 1, fp);
+
+        printf("\n sorted : %u" , current_integer);
     }
 
-    return empty_trash_bin[size];
+    fclose(fp);
+
+    I4 max = empty_trash_bin[size];
+    free(empty_trash_bin);
+
+    return max;
 }
-
+//  //  //  //  //  //  //  // //  //  //  //  //  //  //  // //  //  //  //  //  //  //  // //  //  //  //  //  //  //  // //  //  //  //  //  //  //  // //  //  //  //  //  //  //  // //  //  //  //  //  // 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////   END GARBAGE COLLECTION LIBRARY  ///////////////////////////////////
-
 
 
 ////////////////////////////////////////////////////////////////////////////////        SAVE IN FILE       ////
@@ -327,7 +343,7 @@ I4 if_space_after(I4 position , I4* filebuffer , I4 limit){
 }
 
 ////////////////////////////////////////////////////////////////////////////////        ADD NODE TO       ////
-I4 add_node_to(I4* filebuffer , I4 limit, I4 path_begin , I4 new_node){
+I4 add_node_or_data_to(I4* filebuffer , I4 limit, I4 path_begin , I4 new_node_or_data){
 
     I4 i = path_begin;
     unsigned char stop = 0;
@@ -350,8 +366,8 @@ I4 add_node_to(I4* filebuffer , I4 limit, I4 path_begin , I4 new_node){
                 if( (limit-1)  == if_space_after(i, filebuffer , limit) ){
 
                     //in check is the free position
-                    filebuffer[i] = new_node;
-                    printf("[new node] %u , is written at filebuffer[%u]\n", new_node , i);
+                    filebuffer[i] = new_node_or_data;
+                    printf("[new node] %u , is written at filebuffer[%u]\n", new_node_or_data , i);
 
                     // if position is current end of file pad the end, in other case is anyway END_SKELETON.. until now is better then a condition(poor registers!!)
                     filebuffer[i+1] = END_SKELETON;
@@ -371,9 +387,9 @@ I4 add_node_to(I4* filebuffer , I4 limit, I4 path_begin , I4 new_node){
                     printf("[%u] now is -> %u\n",i, filebuffer[i] );
 
                     // set new node at available memory
-                    filebuffer[available_memory_at] = new_node;
+                    filebuffer[available_memory_at] = new_node_or_data;
                     limit ++;
-                    printf(" new_node[%u] written in filebuffer[%u]\n", new_node, (available_memory_at) );
+                    printf(" new_node_or_data[%u] written in filebuffer[%u]\n", new_node_or_data, (available_memory_at) );
 
                     // add END_SKELETON right after that
                     filebuffer[available_memory_at +1] = END_SKELETON;
@@ -438,7 +454,7 @@ I4 init_node_in_path(I4* filebuffer, I4 path_begin, I4 filebuffer_count, I4 *END
     }
     if(found_and_initialized == 0){
         if(i != 0){
-            printf("\nNOT ANY uninitialized node found: NODE_SKELETON in path: /%u not foud, you need to add_node_to -> %u ", path_begin , path_begin);
+            printf("\nNOT ANY uninitialized node found: NODE_SKELETON in path: /%u not foud, you need to add_node_or_data_to -> %u ", path_begin , path_begin);
             return filebuffer_count;
         }
     }
@@ -474,7 +490,6 @@ I4 init_node_in_path(I4* filebuffer, I4 path_begin, I4 filebuffer_count, I4 *END
 
 ////////////////////////////////////////////////////////////////////////////////        GET BEGIN FROM NODE       ////
 I4 get_node_begin( I4* filebuffer, I4 node){
-
     printf("\n\n     Node begin\n\n");
 
     I4 node_begin = 0;
@@ -519,17 +534,16 @@ I4 delete(I4* file_buffer , I4 i_end , I4 i_ndex){
     if(!result) return result;
 
     I4 data = trim_first_2_bits(file_buffer[i_ndex]);
-
     printf("deleted: %u ; ( data + type %u ) - type %u = data %u " , data , file_buffer[i_ndex] , DATA_SKELETON , data);
-    file_buffer[ i_ndex ] = file_buffer[ i_end - 1 ];
-    file_buffer[ i_end - 1 ] = END_SKELETON;
 
+    // writing the last element of the branch in the element to delete
+    file_buffer[ i_ndex ] = file_buffer[ i_end - 1 ];
+    // set an END_SKELETON to that last element, that is now in the place of the deleted element
+    file_buffer[ i_end - 1 ] = END_SKELETON;
     // Write free space in garbage collection
     garbage_drop_in_trash(i_end);
 
     printf("\n\nfree space should be: %u" , i_end);
-
-    
     return result;
 }
 
@@ -594,7 +608,7 @@ int main() {
 
         // add node to path: begin
         if( 0 ){
-           int32count = add_node_to( file_buffer,
+           int32count = add_node_or_data_to( file_buffer,
                                      int32count, 
                                      begin, 
                                      newBranch );
@@ -615,7 +629,6 @@ int main() {
         }
  
         // begin is the index in filebuffer , filebuffer[begin]
-
         // get from initialized node in filebuffer, the pointed address
         begin = get_node_begin(file_buffer , begin);
         // now is possible to search something in the path beginneng from filebuffer[begin]
@@ -639,24 +652,17 @@ int main() {
    // adding a node or data again in that branch will just take the place back with if_space_after
    // if there are more then 2 free places after one other the garbage collector can assign memory there.. in the case
 
-
     I4 sorting [] = {12,3,4,3,5,4,24,9,8,7,6,5,4,3,2,1,1,11,14,6,66,8,79,8,81,6,5,7,3,6,8,3,2,2,4,6,8,4,2,2,5,7,8,9,9,4,2,5,5,7,6,8,4,1,
     212,98,8457,58789,5,6,8793,5176562,5745,7,9,46,24557,58,9456,26,5,74585,6,6565,6,385,8,56,3748,4562345,249,58078468,6256,5756846,
     51,4526,48,4747,245647,6545,627,458,56,4,5152,5,45,6,7,5,45,4526,7,457,68,45,61,2,52,462,45,74,475,2,9847,5,2874,594,8,6720641,7,
     4524,579,684,5,79865513,586,50,702360,65,9702,36,5230,516,298749,87,6,2451,98,4756,498,72,8246,207117,4607,4962,4651,265,9,82641865,
     14,6529,87,6965194,659,26,4641962,98,65,298,652,98652,46,29,486,52,86,526,59,84,65,9,865165,92,86,598,65,62,984,7519,874,70,23652,
     315,162,987,4987,6,245,198,475,649,8728,24,620,7017,460,7496,24,65026,598,264189,84752,984,75,28,745,9486,720,641,74,524,5796,845,6};
-
-
     size_t zise = sizeof sorting / sizeof (I4);
     sort_int32(sorting , zise);
-    
     for( size_t i = 0; i < zise; i++ ){
-
         printf("%u," , sorting[i] );
-    
     }
-
 
     // assuming branch at 0 is initialized
     // search wht is in node position 0
@@ -678,31 +684,38 @@ int main() {
     printf("There are currently %d 4-bytes INTEGERS in the file \n", garbage32count );
     printf("Current filesize: %d bytes\n", filesize );
 
-    // tempI4 = delete(file_buffer , ends_buffer[n_breaks-1] , 8 );
-    // if(!tempI4) printf("filebuffer[%u] IS NOT A DATA, IS A NODE -->", 8);
-    // save(FILENAME , file_buffer , int32count);
 
 
 
-    // when something deleted garbage collection is to increase
-    if(tempI4) int32count++;
+
+    if(1){
+
+       tempI4 = delete(file_buffer , ends_buffer[n_breaks-1] ,  8);
+       if(!tempI4) printf("filebuffer[%u] IS NOT A DATA, IS A NODE -->", 8);
+
+       save(FILENAME , file_buffer , int32count);
+
+    }
+
+
+
 
     struct scavage scavaging;
-    garbage_get_compost( &scavaging , 3 , tempI4);
+    //when something deleted garbage collection is to increase
+    if(tempI4){
+        garbage32count++;
 
-    printf("\nindex:%u , count:%u \n" , scavaging.index , scavaging.count);
-    printf("\nresult: %u \n", tempI4);
+        ///////////////////////////////////////////////////////
+        garbage_get_compost( &scavaging , 3 , garbage32count);
+        printf("\nindex:%u , count:%u \n" , scavaging.index , scavaging.count);
+        ///////////////////////////////////////////////////////
 
-    garbage_turn_bin(int32count);
-
-    garbage_sort(int32count);
+        garbage_sort(garbage32count);
+        garbage_turn_bin(garbage32count);    
+    } 
 
     // printing anyways
     get_path(file_buffer, path_buffer , begin );
-
-
-
-
 
     // #free_heap
     free(file_buffer);
