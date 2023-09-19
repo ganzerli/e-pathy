@@ -166,7 +166,7 @@ void garbage_turn_bin(I4 zise){
 I4 garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
 
     I4 result = 0;
-    I4 size_found = 0;
+    I4 size_found = 1;                          // one there is always , 2 to have END, more to save memory and speed  [0][END]
     I4 current_integer = 0;
     I4 last_integer = SOMETHING_WENT_WRONG - 1;
     scavaging->index = 0;
@@ -180,6 +180,10 @@ I4 garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
     for (I4 i = 0; i < I4count; i++){
         fread(&current_integer, sizeof (I4), 1, fp);
         
+        
+        line();
+        printf("current_int = %u , last_int = %u" , current_integer , last_integer );
+        
         if(current_integer == last_integer +1){
             last_integer = current_integer;
             size_found++;
@@ -188,13 +192,26 @@ I4 garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
             last_integer = current_integer;
         }
 
+        line();
+        printf("size found = %u" ,size_found);
+        line();
+        printf("size needed = %u" , size_needed);
+
         // a need to set a data not at end of file, is that that position is free, but then there is also space for a [END]
         // assuming  that the size needed is only 1, [there][and also an end] (probably to avoid too much jumps is better to have big blocks of data)
-        if(size_found > size_needed){
-            scavaging->index = current_integer;
+        // in that case i is : taht END that should remain: asked 3 ....[1][2][3][END] or ...[0][1][2][END]
+        if(size_found == size_needed){
+
+            // when current_integer[1] == last_integer[0] +1 , collected are 2, and i is 1;
+            // if needed are 4 then current integer is [4]
+            // to have the first last_integer[0] starting to count is now, current_integer[4] - 4; so index is at first last_integer[0];
+            // this happen now when current_integer[4] is = size needed 4
+            // so to have all the space needed is just i - size_needed
+
+            scavaging->index = i - size_needed;
             scavaging->count = size_found;
 
-            // in that case i is : taht END that should remain: asked 3 ....[1][2][3][END] or ...[0][1][2][END]
+
             result = i;
             i = I4count;
             break;
@@ -709,7 +726,7 @@ int main() {
     
     if( tempI4 ){
         ///////////////////////////////////////////////////////
-        garbage_get_compost( &scavaging , 3 , garbage32count);
+        garbage_get_compost( &scavaging , garbage32count , 7);
         ///////////////////////////////////////////////////////
         garbage_turn_bin(garbage32count);    
     } 
