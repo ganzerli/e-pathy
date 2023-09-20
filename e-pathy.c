@@ -10,6 +10,14 @@
 #define DATA_SKELETON           0b01000000000000000000000000000000
 #define END_SKELETON            0b00000000000000000000000000000000
 
+#define MAX_FILE_SIZE           ( SOMETHING_WENT_WRONG - 1024 )
+
+//  E R R O R S
+#define ERROR_1                 ( SOMETHING_WENT_WRONG - 1 )
+#define ERROR_2                 ( SOMETHING_WENT_WRONG - 2 )
+#define ERROR_3                 ( SOMETHING_WENT_WRONG - 3 )
+#define ERROR_4                 ( SOMETHING_WENT_WRONG - 4 )
+
  // 4 bytes integer
 typedef u_int32_t  I4;     
 
@@ -18,9 +26,13 @@ struct scavage{
     I4 count;
 };
 
+// MEGA FRAMEWORK
 void line(){
     printf("\n");
 }
+
+// GLOBAL VARIABLE FOR GARBAGE COLLECTION LIBRARY
+I4 garbage32count = 0;
 
 ////////////////////////////////////////////////////////////////////////////////        IS END       ////
 unsigned int is_END(I4 num){
@@ -85,7 +97,6 @@ I4 epathy_check(){
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////     USEFUL FUNCTIONS FOR AN OUTER LIBRARY       ////////////////////////////////////////////////////
-
 void sort_int32( I4 *data , I4 size ){
 
     unsigned int count = (unsigned int) size -1;
@@ -109,25 +120,34 @@ void sort_int32( I4 *data , I4 size ){
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  // 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                                                                         /*    GARBAGE   */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  // 
 
 ////////////////////////////////////////////////////////////////////////////////        CHECK GARBAGE FILE       ////
 // CHECKS IF FILE EXISTS, AND RETURNS NUMBER OF 32BITS INT IN THE FILE
 I4 garbage_check(){
 
+    printf("\n\n    Checking garbage file   ....");
+
     I4 ints_count = 0;                     
     I4 bytes_count = 0;
     FILE *fp;
 
+    // check in file how much I4 there are
     fp=fopen(GARBAGE,"ab");                                            
     fseek(fp, 0, SEEK_END);
     bytes_count = ftell(fp);
     fclose(fp);
     
     ints_count = bytes_count / 4;
+
+    printf("\nGARBAGE:    There are currently %u 4-Bytes INTEGERS in the file" , ints_count);
+    printf("\nFilesize %u Bytes" , bytes_count);
+
+
     return ints_count;
 }
 
@@ -138,6 +158,7 @@ I4 garbage_drop_in_trash(I4 index){
     FILE *fp;
     I4 idnex = index;
 
+    // write new index in garbage collection file
     fp=fopen(GARBAGE,"ab");      
     fwrite(&idnex, sizeof (I4), 1, fp); 
     printf("\n written in garbage collector: %u" , idnex);
@@ -148,10 +169,10 @@ I4 garbage_drop_in_trash(I4 index){
 ////////////////////////////////////////////////////////////////////////////////        TAKE TRASH BIN AND TURN IT UPSIDE DOWN       ////
 void garbage_turn_bin(I4 zise){
 
+    printf("\n\n  Turning the trhash bin...\n");
+
     FILE *fp=fopen(GARBAGE,"rb");      
     I4 current_integer = 0;
-
-    printf("\n  Turning the trhash bin...\n");
 
     for (I4 i = 0; i < zise; i++){
         fread(&current_integer, sizeof (I4), 1, fp);
@@ -163,7 +184,10 @@ void garbage_turn_bin(I4 zise){
 }
 
 ////////////////////////////////////////////////////////////////////////////////       GET SIZE AND POSITION OF DELETED ITEMS       ////
-I4 garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
+void garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
+
+    // !!!!!!!!!!!! size needed is without [END]! in scavaging MUST be coun > 0 only if FOUND is COUNT+1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    printf("\n\n    GARBAGE CHECK FOR FREE SPACE\n");
 
     I4 result = 0;
     I4 size_found = 1;                                          // size needed will be at least 2 [I4][END], more is better memory and speed..
@@ -171,12 +195,11 @@ I4 garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
     I4 last_integer = SOMETHING_WENT_WRONG - 1;
     scavaging->index = 0;
     scavaging->count = 0;
-
     FILE *fp =fopen(GARBAGE,"rb");
+    
     if(fp == NULL)  fprintf(stderr, "error opening file: %s #RUNNING %s at line # %d\n", GARBAGE, __FILE__, __LINE__ - 1);
 
     // having the file sorted..
- 
     for (I4 i = 0; i < I4count; i++){
 
         // collecting a current_integer from file
@@ -192,57 +215,97 @@ I4 garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
         // remember current integer for next loop
         last_integer = current_integer;
 
-        if(size_found == size_needed){
+        if(size_found > size_needed){
             // case ... [10][11][12][13]
             // size needed 4;
             //          [1] [2] [3] [4]
             // i =      [ 0][ 1][ 2][ 3]
-            scavaging->index = i - (size_needed - 1);
-            scavaging->count = size_found;
+            scavaging->index = i - (size_found - 1);
+            scavaging->count = size_needed;
 
             result = i;
             i = I4count;
             break;
         }
     }
-    
-    printf("\nindex:%u , count:%u \n" , scavaging->index , scavaging->count);
-
     fclose(fp);
 
+    printf("\nindex: %u \ncount: %u \n" , scavaging->index , scavaging->count);
 }
 
+////////////////////////////////////////////////////////////////////////////////       DELETE REUSED-ALLOCATED MEMORY FOR GARBAGE COLLECTION     ////
+I4 garbage_memory_allocated(I4 index , I4 count){
+
+    // in garbage get compost is allocated count only if count + 1 found
+    // the program will ask for amount of memory only the functions will keep count of the [END] needed allocating memory
+    // count need to be incremented considerating count and also [END]! [c][o][u][n][t][END]
+    I4 counz = count + 1;                                  // always remember the need of [END]
+
+    printf("\n\n    UPDATE GARBAGE COLLECTON FILE\n");
+
+    FILE *fp =fopen(GARBAGE,"rb");
+    if(fp == NULL)  fprintf(stderr, "error opening file: %s #RUNNING %s at line # %d\n", GARBAGE, __FILE__, __LINE__ - 1);
+
+    I4 *empty_trash_bin = malloc(256 * sizeof (I4));
+    I4 current_integer = 0;
+
+    for (I4 i = 0; i < garbage32count; i++){
+        fread(&current_integer , sizeof(I4) , 1 , fp);
+        empty_trash_bin[i] = current_integer;
+    }
+
+    I4 i = 0;
+    printf("\nIntegers remaining in garbage collection file\n");
+    // collect everything until [<-][<-][<-][<-] [index]
+    for ( i = 0; i < index; i++ ){
+        printf("(%u) " , empty_trash_bin[i]);
+    }
+    
+    // collect everything after i+count [0] [1] [2] [3] [4] [5] [6] [7]
+    //        i                         [i][+1][+2][+3]     
+    //        count                     [1] [2] [3] [4]
+    for ( i = index + counz; i < garbage32count; i++ ){
+        printf("(%u)" , empty_trash_bin[i]);
+    }
+
+
+    free(empty_trash_bin);
+    garbage32count -= counz;
+
+    printf("\nCount of I4 in garbage collection file: %u \n" , garbage32count);
+    return garbage32count;
+}
 
 ////////////////////////////////////////////////////////////////////////////////       SORT GARBAGE FILE       ////
 I4 garbage_sort(I4 size){
 
-    printf("\n\n    sorting    -> %u elements \n" , size);
-    if(size == 0)  return 0;                                                    // or it crashes...
+    printf("\n\n    GARBAGE SORTING  -> %u elements \n" , size);
+    if(size == 0)  return 0;                                                    
 
     I4 *empty_trash_bin = malloc(256 * sizeof (I4));
-
     I4 current_integer = 0;
-
     FILE *fp = fopen(GARBAGE,"rb");
+    
     if(fp == NULL) return 0;
 
+    // LOAD FILE
     for (I4 i = 0; i < size; i++){
         fread(&current_integer, sizeof (I4), 1, fp);
         empty_trash_bin[i] = current_integer;
     }
     fclose(fp);
 
+    // SORTING
     sort_int32(empty_trash_bin , size);
 
+    // WRITE BACK
     fp = fopen(GARBAGE ,"wb");
-
     for (I4 i = 0; i < size; i++){
         current_integer = empty_trash_bin[i];
         fwrite(&current_integer, sizeof (I4), 1, fp);
 
         printf("\n sorted : %u" , current_integer);
     }
-
     fclose(fp);
 
     I4 max = empty_trash_bin[size];
@@ -250,6 +313,7 @@ I4 garbage_sort(I4 size){
 
     return max;
 }
+
 //  //  //  //  //  //  //  // //  //  //  //  //  //  //  // //  //  //  //  //  //  //  // //  //  //  //  //  //  //  // //  //  //  //  //  //  //  // //  //  //  //  //  //  //  // //  //  //  //  //  // 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////   END GARBAGE COLLECTION LIBRARY  ///////////////////////////////////
 
@@ -456,7 +520,6 @@ I4 init_node_in_path(I4* filebuffer, I4 path_begin, I4 filebuffer_count, I4 *END
             return filebuffer_count;
         }
     }
-
     printf("\nNODE_SKELETON at position[%u] , initializing...\n",found_and_initialized);
     printf("in fielbuffer[%u] the data is: [%u]\n", found_and_initialized, filebuffer[found_and_initialized]);
     printf("inititalizing node.....\n\n");
@@ -525,8 +588,8 @@ I4 get_path( I4* filebuffer, I4* path_buffer, I4 node_begin){
     return count;
 }
 
-
-I4 delete(I4* file_buffer , I4 i_end , I4 i_ndex , I4 *garbage_count){
+////////////////////////////////////////////////////////////////////////////////        DELETE DATA       ////
+I4 delete(I4* file_buffer , I4 i_end , I4 i_ndex ){
 
     I4 result = is_DATA(file_buffer[i_ndex]);
 
@@ -542,13 +605,11 @@ I4 delete(I4* file_buffer , I4 i_end , I4 i_ndex , I4 *garbage_count){
     file_buffer[ i_ndex ] = file_buffer[ i_end - 1 ];
     // set an END_SKELETON to that last element, that is now in the place of the deleted element
     file_buffer[ i_end - 1 ] = END_SKELETON;
+
     // Write free space in garbage collection
     garbage_drop_in_trash(i_end);
-
     // update count for thrash
-    I4 gc = *garbage_count;
-    gc++;
-    *garbage_count = gc;
+    garbage32count++;
 
     printf("\n\nfree space should be: %u" , i_end);
     return result;
@@ -609,7 +670,6 @@ int main() {
 //  END SOME INPUT
 
     I4 begin = 0;
-
     // needed to know when to jump where
     I4 n_breaks = find_ENDs( file_buffer , ends_buffer , begin );
 
@@ -617,7 +677,7 @@ int main() {
     if(int32count > 0){
 
         // add node to path: begin
-        if( 1 ){
+        if( 0 ){
            int32count = add_node_or_data_to( file_buffer,
                                      int32count, 
                                      begin, 
@@ -637,7 +697,6 @@ int main() {
 
             save(FILENAME , file_buffer , int32count);
         }
- 
         // begin is the index in filebuffer , filebuffer[begin]
         // get from initialized node in filebuffer, the pointed address
         begin = get_node_begin(file_buffer , begin);
@@ -645,7 +704,6 @@ int main() {
     
         // get content of entire path beginning from: begin
         get_path(file_buffer, path_buffer , begin );
-    
     }
     
    // remove
@@ -662,17 +720,18 @@ int main() {
    // adding a node or data again in that branch will just take the place back with if_space_after
    // if there are more then 2 free places after one other the garbage collector can assign memory there.. in the case
 
-    // I4 sorting [] = {12,3,4,3,5,4,24,9,8,7,6,5,4,3,2,1,1,11,14,6,66,8,79,8,81,6,5,7,3,6,8,3,2,2,4,6,8,4,2,2,5,7,8,9,9,4,2,5,5,7,6,8,4,1,
-    // 212,98,8457,58789,5,6,8793,5176562,5745,7,9,46,24557,58,9456,26,5,74585,6,6565,6,385,8,56,3748,4562345,249,58078468,6256,5756846,
-    // 51,4526,48,4747,245647,6545,627,458,56,4,5152,5,45,6,7,5,45,4526,7,457,68,45,61,2,52,462,45,74,475,2,9847,5,2874,594,8,6720641,7,
-    // 4524,579,684,5,79865513,586,50,702360,65,9702,36,5230,516,298749,87,6,2451,98,4756,498,72,8246,207117,4607,4962,4651,265,9,82641865,
-    // 14,6529,87,6965194,659,26,4641962,98,65,298,652,98652,46,29,486,52,86,526,59,84,65,9,865165,92,86,598,65,62,984,7519,874,70,23652,
-    // 315,162,987,4987,6,245,198,475,649,8728,24,620,7017,460,7496,24,65026,598,264189,84752,984,75,28,745,9486,720,641,74,524,5796,845,6};
-    // I4 zise = sizeof sorting / sizeof (I4);
-    // sort_int32(sorting , zise);
-    // for( I4 i = 0; i < zise; i++ ){
-    //     printf("%u," , sorting[i] );
-    // }
+    I4 sorting [] = {12,3,4,3,5,4,24,9,8,7,6,5,4,3,2,1,1,11,14,6,66,8,79,8,81,6,5,7,3,6,8,3,2,2,4,6,8,4,2,2,5,7,8,9,9,4,2,5,5,7,6,8,4,1,
+    212,98,8457,58789,5,6,8793,5176562,5745,7,9,46,24557,58,9456,26,5,74585,6,6565,6,385,8,56,3748,4562345,249,58078468,6256,5756846,
+    51,4526,48,4747,245647,6545,627,458,56,4,5152,5,45,6,7,5,45,4526,7,457,68,45,61,2,52,462,45,74,475,2,9847,5,2874,594,8,6720641,7,
+    4524,579,684,5,79865513,586,50,702360,65,9702,36,5230,516,298749,87,6,2451,98,4756,498,72,8246,207117,4607,4962,4651,265,9,82641865,
+    14,6529,87,6965194,659,26,4641962,98,65,298,652,98652,46,29,486,52,86,526,59,84,65,9,865165,92,86,598,65,62,984,7519,874,70,23652,
+    315,162,987,4987,6,245,198,475,649,8728,24,620,7017,460,7496,24,65026,598,264189,84752,984,75,28,745,9486,720,641,74,524,5796,845,6};
+    I4 zise = sizeof sorting / sizeof (I4);
+    sort_int32(sorting , zise);
+    line();
+    for( I4 i = 0; i < zise; i++ ){
+        printf("%u," , sorting[i] );
+    }
 
     // assuming branch at 0 is initialized
     // search wht is in node position 0
@@ -686,20 +745,14 @@ int main() {
     get_path(file_buffer, path_buffer , begin );
 
     // when no file or empty format for use
-    I4 garbage32count = garbage_check();
+    garbage32count = garbage_check();
     filesize = (garbage32count * 4);
-
-    // PRINT USEFUL INFO
-    printf("\n\n    GARBAGE:    There are currently %d 4-bytes INTEGERS in the file", garbage32count );
-    printf("\n    Current filesize: %d bytes\n", filesize );
-
-
 
     tempI4 = 0;
 
     if( 0 ){
 
-        tempI4 = delete(file_buffer , ends_buffer[n_breaks-1] ,  7 , &garbage32count);
+        tempI4 = delete(file_buffer , ends_buffer[n_breaks-1] ,  7 );
         if( tempI4 ){
             garbage_sort(garbage32count);
             save(FILENAME , file_buffer , int32count);
@@ -714,7 +767,7 @@ int main() {
     
     if( tempI4 ){
         ///////////////////////////////////////////////////////
-        garbage_get_compost( &scavaging , garbage32count , 7);
+        garbage_get_compost( &scavaging , garbage32count , 5);
         ///////////////////////////////////////////////////////
         garbage_turn_bin(garbage32count);    
     } 
@@ -722,13 +775,15 @@ int main() {
     // printing anyways
     get_path(file_buffer, path_buffer , begin );
 
+    // !! to use if and onyly if the memory is allocated correctly!!
+    tempI4 = garbage_memory_allocated( scavaging.index , scavaging.count);
+
+
     // #free_heap
     free(file_buffer);
     free(ends_buffer);
     free(path_buffer);
     free(new_data_or_nodes);
-
-
 
    return EXIT_SUCCESS;
 }
