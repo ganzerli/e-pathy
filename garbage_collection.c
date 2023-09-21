@@ -1,15 +1,11 @@
-
-
-#define GARBAGE "thrash"
-
 // GLOBAL VARIABLE FOR GARBAGE COLLECTION LIBRARY
 I4 garbage32count = 0;
+#define GARBAGE "thrash"
 
 struct scavage{
     I4 index;
     I4 count;
 }scavaging;
-
 
 ////////////////////////////////////////////////////////////////////////////////        CHECK GARBAGE FILE       ////
 // CHECKS IF FILE EXISTS, AND RETURNS NUMBER OF 32BITS INT IN THE FILE
@@ -32,7 +28,6 @@ I4 garbage_check(){
     printf("\nGARBAGE:    There are currently %u 4-Bytes INTEGERS in the file" , ints_count);
     printf("\nFilesize %u Bytes" , bytes_count);
 
-
     return ints_count;
 }
 
@@ -44,11 +39,13 @@ I4 garbage_drop_in_trash(I4 index){
     I4 idnex = index;
 
     // write new index in garbage collection file
-    fp=fopen(GARBAGE,"ab");      
+    fp=fopen(GARBAGE,"ab");
+    if (fp == NULL) return 0;
+
     fwrite(&idnex, sizeof (I4), 1, fp); 
     printf("\n written in garbage collector: %u" , idnex);
     fclose(fp);
-    
+    return 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////        TAKE TRASH BIN AND TURN IT UPSIDE DOWN       ////
@@ -65,7 +62,6 @@ void garbage_turn_bin(I4 zise){
     }
     printf("\n");
     fclose(fp);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////       GET SIZE AND POSITION OF DELETED ITEMS       ////
@@ -114,13 +110,11 @@ void garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed
         }
     }
     fclose(fp);
-
     printf("\nindex: %u \ncount: %u \n" , scavaging->index , scavaging->count);
 }
 
 ////////////////////////////////////////////////////////////////////////////////       DELETE REUSED-ALLOCATED MEMORY FOR GARBAGE COLLECTION     ////
 I4 garbage_memory_allocated(I4 index , I4 count){
-
     // in garbage get compost is allocated count only if count + 1 found
     // the program will ask for amount of memory only the functions will keep count of the [END] needed allocating memory
     // count need to be incremented considerating count and also [END]! [c][o][u][n][t][END]
@@ -145,15 +139,12 @@ I4 garbage_memory_allocated(I4 index , I4 count){
     for ( i = 0; i < index; i++ ){
         printf("(%u) " , empty_trash_bin[i]);
     }
-    
     // collect everything after i+count [0] [1] [2] [3] [4] [5] [6] [7]
     //        i                         [i][+1][+2][+3]     
     //        count                     [1] [2] [3] [4]
     for ( i = index + counz; i < garbage32count; i++ ){
         printf("(%u)" , empty_trash_bin[i]);
     }
-
-
     free(empty_trash_bin);
     garbage32count -= counz;
 
