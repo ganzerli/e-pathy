@@ -24,7 +24,7 @@ typedef u_int32_t  I4;
 struct scavage{
     I4 index;
     I4 count;
-};
+}scavaging;
 
 // MEGA FRAMEWORK
 void line(){
@@ -58,6 +58,18 @@ I4 trim_first_2_bits(I4 data){
 ////////////////////////////////////////////////////////////////////////////////        REQUIRE MEMORY       ////
 I4 require_memory(I4 amount, I4 limit){
     // SEARCH THROUGHT GARBAGE COLLECTOR..
+    garbage_get_compost(&scavaging , garbage32count , amount);
+
+    if(scavaging.count != 0){
+        garbage_memory_allocated(scavaging.index ,scavaging.count);
+        return scavaging.index;
+    }
+
+    if(limit > MAX_FILE_SIZE){
+        // CHECK FOR NEW FILE
+    }
+
+
     return limit;
 }
 
@@ -695,7 +707,7 @@ int main() {
                                             n_breaks, 
                                             new_data_or_nodes );
 
-            save(FILENAME , file_buffer , int32count);
+            //save(FILENAME , file_buffer , int32count);
         }
         // begin is the index in filebuffer , filebuffer[begin]
         // get from initialized node in filebuffer, the pointed address
@@ -762,7 +774,6 @@ int main() {
 
     // JUST FPR TESTING PORPOSES
     tempI4 = 1;
-    struct scavage scavaging;
     //when something deleted garbage collection is to increase
     
     if( tempI4 ){
