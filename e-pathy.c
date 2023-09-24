@@ -47,7 +47,7 @@ I4 trim_first_2_bits(I4 data){
 ////////////////////////////////////////////////////////////////////////////////        REQUIRE MEMORY       ////
 I4 require_memory(I4 amount, I4 limit){
     // SEARCH THROUGHT GARBAGE COLLECTOR..
-    garbage_get_compost(&scavaging , garbage32count , amount);
+    garbage_get_compost(&scavaging , amount);
 
     if(scavaging.count != 0){
         garbage_memory_allocated(scavaging.index ,scavaging.count);
@@ -57,8 +57,6 @@ I4 require_memory(I4 amount, I4 limit){
     if(limit > MAX_FILE_SIZE){
         // CHECK FOR NEW FILE
     }
-
-
     return limit;
 }
 
@@ -483,32 +481,7 @@ int main() {
         get_path(file_buffer, path_buffer , begin );
     }
     
-   // remove
-   
-   //   if is node message you need to delete single data
-   //   get begin of node
-   //   find [data to delete]
-   //   run to end of branch
-   //   copy the last data or node in [data to delete]
-   //   cover with an END_SKELETON
-   //   write the last END_SKELETON in garbage collector file
-   //   exiting the program order garbage collection file
-
-   // adding a node or data again in that branch will just take the place back with if_space_after
-   // if there are more then 2 free places after one other the garbage collector can assign memory there.. in the case
-
-    I4 sorting [] = {12,3,4,3,5,4,24,9,8,7,6,5,4,3,2,1,1,11,14,6,66,8,79,8,81,6,5,7,3,6,8,3,2,2,4,6,8,4,2,2,5,7,8,9,9,4,2,5,5,7,6,8,4,1,
-    212,98,8457,58789,5,6,8793,5176562,5745,7,9,46,24557,58,9456,26,5,74585,6,6565,6,385,8,56,3748,4562345,249,58078468,6256,5756846,
-    51,4526,48,4747,245647,6545,627,458,56,4,5152,5,45,6,7,5,45,4526,7,457,68,45,61,2,52,462,45,74,475,2,9847,5,2874,594,8,6720641,7,
-    4524,579,684,5,79865513,586,50,702360,65,9702,36,5230,516,298749,87,6,2451,98,4756,498,72,8246,207117,4607,4962,4651,265,9,82641865,
-    14,6529,87,6965194,659,26,4641962,98,65,298,652,98652,46,29,486,52,86,526,59,84,65,9,865165,92,86,598,65,62,984,7519,874,70,23652,
-    315,162,987,4987,6,245,198,475,649,8728,24,620,7017,460,7496,24,65026,598,264189,84752,984,75,28,745,9486,720,641,74,524,5796,845,6};
-    I4 zise = sizeof sorting / sizeof (I4);
-    sort_int32(sorting , zise);
-    printf("\n");
-    for( I4 i = 0; i < zise; i++ ){
-        printf("%u," , sorting[i] );
-    }
+   // // // // // // // // // // // // // // // // // // // // // // // // // R E M O V E
 
     // assuming branch at 0 is initialized
     // search wht is in node position 0
@@ -537,13 +510,13 @@ int main() {
 
     }
 
-    // JUST FPR TESTING PORPOSES
+    // JUST FPR TESTING PORPOSESgarbage32count
     tempI4 = 1;
     //when something deleted garbage collection is to increase
     
     if( tempI4 ){
         ///////////////////////////////////////////////////////
-        garbage_get_compost( &scavaging , garbage32count , 5);
+        garbage_get_compost( &scavaging  , 5 );
         ///////////////////////////////////////////////////////
         garbage_turn_bin(garbage32count);    
     } 
@@ -553,7 +526,6 @@ int main() {
 
     // !! to use if and onyly if the memory is allocated correctly!!
     tempI4 = garbage_memory_allocated( scavaging.index , scavaging.count);
-
 
     // #free_heap
     free(file_buffer);
