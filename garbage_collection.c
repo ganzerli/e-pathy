@@ -72,12 +72,13 @@ void garbage_get_compost(struct scavage * scavaging , I4 size_needed){
 
     const I4 I4count = garbage32count;
 
-    I4 result = 0;
     I4 size_found = 1;                                          // size needed will be at least 2 [I4][END], more is better memory and speed..
     I4 current_integer = 0;
     I4 last_integer = SOMETHING_WENT_WRONG - 1;
+
     scavaging->index = 0;
     scavaging->count = 0;
+    
     FILE *fp =fopen(GARBAGE,"rb");
     
     if(fp == NULL)  fprintf(stderr, "error opening file: %s #RUNNING %s at line # %d\n", GARBAGE, __FILE__, __LINE__ - 1);
@@ -99,14 +100,13 @@ void garbage_get_compost(struct scavage * scavaging , I4 size_needed){
         last_integer = current_integer;
 
         if(size_found > size_needed){
-            // case ... [10][11][12][13]
+            // case ... [10][11][12][13] > [14]
             // size needed 4;
-            //          [1] [2] [3] [4]
-            // i =      [ 0][ 1][ 2][ 3]
-            scavaging->index = i - (size_found - 1);
+            //          [1] [2] [3] [4] [+1 for END] (thats why > and not ==)
+            // i =      [ 0][ 1][ 2][ 3][ 4]
+            scavaging->index = current_integer - size_needed;
             scavaging->count = size_needed;
 
-            result = i;
             i = I4count;
             break;
         }
