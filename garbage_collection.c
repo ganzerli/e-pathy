@@ -1,11 +1,13 @@
-// GLOBAL VARIABLE FOR GARBAGE COLLECTION LIBRARY
+// GLOBAL VARIABLES
 I4 garbage32count = 0;
-#define GARBAGE "thrash"
 
 struct scavage{
-    I4 index;
+    I4 index_data_file;
+    I4 index_garbage_file;
     I4 count;
 }scavaging;
+
+#define GARBAGE "thrash"
 
 ////////////////////////////////////////////////////////////////////////////////        CHECK GARBAGE FILE       ////
 // CHECKS IF FILE EXISTS, AND RETURNS NUMBER OF 32BITS INT IN THE FILE
@@ -49,9 +51,11 @@ I4 garbage_drop_in_trash(I4 index){
 }
 
 ////////////////////////////////////////////////////////////////////////////////        TAKE TRASH BIN AND TURN IT UPSIDE DOWN       ////
-void garbage_turn_bin(I4 zise){
+void garbage_turn_bin(){
 
     printf("\n\n  Turning the trhash bin...\n");
+
+    const I4 zise = garbage32count;
 
     FILE *fp=fopen(GARBAGE,"rb");      
     I4 current_integer = 0;
@@ -65,7 +69,7 @@ void garbage_turn_bin(I4 zise){
 }
 
 ////////////////////////////////////////////////////////////////////////////////       GET SIZE AND POSITION OF DELETED ITEMS       ////
-void garbage_get_compost(struct scavage * scavaging , I4 size_needed){
+void garbage_get_compost( I4 size_needed){
 
     // !!!!!!!!!!!! size needed is without [END]! in scavaging MUST be coun > 0 only if FOUND is COUNT+1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     printf("\n\n    GARBAGE CHECK FOR FREE SPACE\n");
@@ -76,8 +80,9 @@ void garbage_get_compost(struct scavage * scavaging , I4 size_needed){
     I4 current_integer = 0;
     I4 last_integer = SOMETHING_WENT_WRONG - 1;
 
-    scavaging->index = 0;
-    scavaging->count = 0;
+    scavaging.index_data_file = 0;
+    scavaging.index_garbage_file = 0;
+    scavaging.count = 0;
     
     FILE *fp =fopen(GARBAGE,"rb");
     
@@ -99,32 +104,30 @@ void garbage_get_compost(struct scavage * scavaging , I4 size_needed){
         // remember current integer for next loop
         last_integer = current_integer;
 
-        if(size_found > size_needed){
-            // case ... [10][11][12][13] > [14]
-            // size needed 4;
-            //          [1] [2] [3] [4] [+1 for END] (thats why > and not ==)
-            // i =      [ 0][ 1][ 2][ 3][ 4]
-            scavaging->index = current_integer - size_needed;
-            scavaging->count = size_needed;
+        if(size_found == size_needed){
+            // case last integers    [10] [11] [12] [13] 
+            // size needed 4         [ 1] [ 2] [ 3] [ 4]
+            // i = example           [ 0] [ 1] [ 2] [ 3]
+            scavaging.index_data_file = current_integer - (size_needed-1);                          // i starts from 0
+            scavaging.index_garbage_file = i - (size_needed-1);                                     // and size needed starts from 1
+            scavaging.count = size_needed;
 
             i = I4count;
             break;
         }
     }
     fclose(fp);
-    printf("\nindex: %u \ncount: %u \n" , scavaging->index , scavaging->count);
+    printf("\nindex for data: %u \nindex in garbage file: %u \ncount: %u \n" , scavaging.index_data_file , scavaging.index_garbage_file , scavaging.count);
 }
 
 ////////////////////////////////////////////////////////////////////////////////       DELETE REUSED-ALLOCATED MEMORY FOR GARBAGE COLLECTION     ////
-I4 garbage_memory_allocated(I4 index , I4 count){
-    // in garbage get compost is allocated count only if count + 1 found
-    // the program will ask for amount of memory only the functions will keep count of the [END] needed allocating memory
-    // count need to be incremented considerating count and also [END]! [c][o][u][n][t][END]
-    I4 counz = count + 1;                                  // always remember the need of [END]
+I4 garbage_memory_allocated(){
 
+    I4 const counz = scavaging.count;                                 
+    I4 const index = scavaging.index_garbage_file;
     printf("\n\n    UPDATE GARBAGE COLLECTON FILE\n");
 
-    FILE *fp =fopen(GARBAGE,"rb");
+    FILE *fp = fopen(GARBAGE,"rb");
     if(fp == NULL)  fprintf(stderr, "error opening file: %s #RUNNING %s at line # %d\n", GARBAGE, __FILE__, __LINE__ - 1);
 
     I4 *empty_trash_bin = malloc(256 * sizeof (I4));
@@ -134,30 +137,36 @@ I4 garbage_memory_allocated(I4 index , I4 count){
         fread(&current_integer , sizeof(I4) , 1 , fp);
         empty_trash_bin[i] = current_integer;
     }
+    fclose(fp);
 
+    fp = fopen(GARBAGE,"wb");
     I4 i = 0;
     printf("\nIntegers remaining in garbage collection file\n");
     // collect everything until [<-][<-][<-][<-] [index]
     for ( i = 0; i < index; i++ ){
         printf("(%u) " , empty_trash_bin[i]);
+        fwrite(&empty_trash_bin[i], sizeof (I4), 1, fp); 
     }
     // collect everything after i+count [0] [1] [2] [3] [4] [5] [6] [7]
     //        i                         [i][+1][+2][+3]     
     //        count                     [1] [2] [3] [4]
     for ( i = index + counz; i < garbage32count; i++ ){
         printf("(%u)" , empty_trash_bin[i]);
+        fwrite(&empty_trash_bin[i], sizeof (I4), 1, fp); 
     }
-
 
     free(empty_trash_bin);
     garbage32count -= counz;
+    fclose(fp);
 
     printf("\nCount of I4 in garbage collection file: %u \n" , garbage32count);
     return garbage32count;
 }
 
 ////////////////////////////////////////////////////////////////////////////////       SORT GARBAGE FILE       ////
-I4 garbage_sort(I4 size){
+I4 garbage_sort(){
+
+    const I4 size = garbage32count;
 
     printf("\n\n    GARBAGE SORTING  -> %u elements \n" , size);
     if(size == 0)  return 0;                                                    

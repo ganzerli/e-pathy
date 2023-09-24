@@ -47,11 +47,17 @@ I4 trim_first_2_bits(I4 data){
 ////////////////////////////////////////////////////////////////////////////////        REQUIRE MEMORY       ////
 I4 require_memory(I4 amount, I4 limit){
     // SEARCH THROUGHT GARBAGE COLLECTOR..
-    garbage_get_compost(&scavaging , amount);
+
+
+    garbage_turn_bin();
+
+
+    garbage_get_compost( amount );
 
     if(scavaging.count != 0){
-        garbage_memory_allocated(scavaging.index ,scavaging.count);
-        return scavaging.index;
+        garbage_memory_allocated();
+        scavaging.count = 0;
+        return scavaging.index_data_file;
     }
 
     if(limit > MAX_FILE_SIZE){
@@ -202,7 +208,6 @@ I4 add_node_or_data_to(I4* filebuffer , I4 limit, I4 path_begin , I4 new_node_or
                 // the end is just replaced 1 position furder and a new data is written in this position
                 if( (limit-1)  == if_space_after(i, filebuffer , limit) ){
 
-                    //in check is the free position
                     filebuffer[i] = new_node_or_data;
                     printf("[new node] %u , is written at filebuffer[%u]\n", new_node_or_data , i);
 
@@ -214,8 +219,8 @@ I4 add_node_or_data_to(I4* filebuffer , I4 limit, I4 path_begin , I4 new_node_or
                     stop = 1;
                     break;
                 }else{
-                    // require memory
-                    available_memory_at = require_memory(1,limit);
+                    // require memory , one for the new node and one for [END]
+                    available_memory_at = require_memory(2,limit);
                     printf(" memory available at [%u]\n", available_memory_at );
 
                     // give to the end the pointer for that position
@@ -241,10 +246,10 @@ I4 add_node_or_data_to(I4* filebuffer , I4 limit, I4 path_begin , I4 new_node_or
                 END_points_to = trim_first_2_bits(filebuffer[i]);
                 printf("end found at filebuffer[%u] containing [%u]\n", i , END_points_to);
 
-                ////////////////////////////////////////////////////////// to review
                 if (END_points_to > END_SKELETON){
                     i = END_points_to;
                     printf("[%u] -> %u \n",i, filebuffer[i]);
+                    // NO NEED OF i--, HERE IS JUST FINDING FOR END TO WRITE THE NEXT DATA OR NODE IN THIS BRANCH
                 }
             }
         }// if is_END(filebuffer[i]);
@@ -289,6 +294,7 @@ I4 init_node_in_path(I4* filebuffer, I4 path_begin, I4 filebuffer_count, I4 *END
             i++;
         } 
     }
+    
     if(found_and_initialized == 0){
         if(i != 0){
             printf("\nNOT ANY uninitialized node found: NODE_SKELETON in path: /%u not foud, you need to add_node_or_data_to -> %u ", path_begin , path_begin);
@@ -309,7 +315,7 @@ I4 init_node_in_path(I4* filebuffer, I4 path_begin, I4 filebuffer_count, I4 *END
     // LOOP JUMPS AT END_SKELETON count needs +1
     count ++;
 
-    printf(" requiring %u of memory \n", count);
+    printf(" %u of memory are required \n", count);
     memory_position = require_memory(count , filebuffer_count);
     printf(" memory available at : [%u]\n", memory_position );
 
@@ -429,7 +435,7 @@ int main() {
     I4 newBranch =  NODE_SKELETON ;
     I4 newData =    0b01010101010101010101010101010101;
 
-//  SOME INPUT
+// SOME INPUT
     new_data_or_nodes[0] = newBranch;
     new_data_or_nodes[1] = newBranch;
     new_data_or_nodes[2] = newBranch;
@@ -441,7 +447,20 @@ int main() {
     new_data_or_nodes[8] = newData;
     new_data_or_nodes[9] = newData;
     new_data_or_nodes[10] = END_SKELETON;
-    I4 new_data_or_nodes_size = 11;
+
+// SOME INPUT TO COVER BACK THE DATA DELETED
+    // new_data_or_nodes[0] = newData;
+    // new_data_or_nodes[1] = newData;
+    // new_data_or_nodes[2] = newData;
+    // new_data_or_nodes[3] = newData;
+    // new_data_or_nodes[4] = newData;
+    // new_data_or_nodes[5] = END_SKELETON;
+
+        // when no file or empty format for use
+    garbage32count = garbage_check();
+    filesize = (garbage32count * 4);
+
+
 //  END SOME INPUT
 
     I4 begin = 0;
@@ -470,7 +489,7 @@ int main() {
                                             n_breaks, 
                                             new_data_or_nodes );
 
-            //save(FILENAME , file_buffer , int32count);
+            save(FILENAME , file_buffer , int32count);
         }
         // begin is the index in filebuffer , filebuffer[begin]
         // get from initialized node in filebuffer, the pointed address
@@ -481,7 +500,7 @@ int main() {
         get_path(file_buffer, path_buffer , begin );
     }
     
-   // // // // // // // // // // // // // // // // // // // // // // // // // R E M O V E
+    // // // // // // // // // // // // // // // // // // // // // // // // // R E M O V E
 
     // assuming branch at 0 is initialized
     // search wht is in node position 0
@@ -494,38 +513,31 @@ int main() {
     // printing anyways
     get_path(file_buffer, path_buffer , begin );
 
-    // when no file or empty format for use
-    garbage32count = garbage_check();
-    filesize = (garbage32count * 4);
+    // tempI4 = 0;
 
-    tempI4 = 0;
+    // if( 0 ){
 
-    if( 0 ){
+    //     tempI4 = delete(file_buffer , ends_buffer[n_breaks-1] ,  7 );
+    //     if( tempI4 ){
+    //         garbage_sort();
+    //         save(FILENAME , file_buffer , int32count);
+    //     }
 
-        tempI4 = delete(file_buffer , ends_buffer[n_breaks-1] ,  7 );
-        if( tempI4 ){
-            garbage_sort(garbage32count);
-            save(FILENAME , file_buffer , int32count);
-        }
+    // }
 
-    }
-
-    // JUST FPR TESTING PORPOSESgarbage32count
-    tempI4 = 1;
-    //when something deleted garbage collection is to increase
+    // JUST FPR TESTING PORPOSES
+    // tempI4 = 0;
+    // //when something deleted garbage collection is to increase
     
-    if( tempI4 ){
-        ///////////////////////////////////////////////////////
-        garbage_get_compost( &scavaging  , 5 );
-        ///////////////////////////////////////////////////////
-        garbage_turn_bin(garbage32count);    
-    } 
+    // if( tempI4 ){
+    //     ///////////////////////////////////////////////////////
+    //     garbage_get_compost( 5 );
+    //     ///////////////////////////////////////////////////////
+    //     garbage_turn_bin();    
+    //     // !! to use if and onyly if the memory is allocated correctly!!
+    //     tempI4 = garbage_memory_allocated();
+    // } 
 
-    // printing anyways
-    get_path(file_buffer, path_buffer , begin );
-
-    // !! to use if and onyly if the memory is allocated correctly!!
-    tempI4 = garbage_memory_allocated( scavaging.index , scavaging.count);
 
     // #free_heap
     free(file_buffer);
@@ -535,3 +547,6 @@ int main() {
 
    return EXIT_SUCCESS;
 }
+
+
+
