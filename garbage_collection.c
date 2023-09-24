@@ -65,10 +65,12 @@ void garbage_turn_bin(I4 zise){
 }
 
 ////////////////////////////////////////////////////////////////////////////////       GET SIZE AND POSITION OF DELETED ITEMS       ////
-void garbage_get_compost(struct scavage * scavaging , I4 I4count, I4 size_needed){
+void garbage_get_compost(struct scavage * scavaging , I4 size_needed){
 
     // !!!!!!!!!!!! size needed is without [END]! in scavaging MUST be coun > 0 only if FOUND is COUNT+1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     printf("\n\n    GARBAGE CHECK FOR FREE SPACE\n");
+
+    const I4 I4count = garbage32count;
 
     I4 result = 0;
     I4 size_found = 1;                                          // size needed will be at least 2 [I4][END], more is better memory and speed..
@@ -145,6 +147,8 @@ I4 garbage_memory_allocated(I4 index , I4 count){
     for ( i = index + counz; i < garbage32count; i++ ){
         printf("(%u)" , empty_trash_bin[i]);
     }
+
+
     free(empty_trash_bin);
     garbage32count -= counz;
 
