@@ -5,6 +5,6 @@ e-pathy is a database shaped as a graph, where you can navigate throught paths a
 
 The goal of the project is to have an extremely fast research, and save memory.
 
-There is a garbage collection, when you delete data, the locations are registered in a file, writing new data, if the count is available, the new data are written in deleted spots.
+There is a garbage collection: when you delete data the locations are written in a file, adding new data, if the count is available, are written in deleted spots.
 
 Compile linux with: gcc -o e-pathy e-pathy.c
