@@ -1,3 +1,11 @@
+// GARBAGE COLLECTION LIBRARY DOES:
+// creating a bin file named thrash, and the fun stuff is that the file is a bin
+// saving integers in this file.
+// sorting the integers ascending
+// having a quantity check if a series of those ints covers the need
+// updates the scavage struct with quantity, starting index in garbage file, and starting index for other file
+// updates the thrash file
+
 // GLOBAL VARIABLES
 I4 garbage32count = 0;
 
@@ -8,18 +16,16 @@ struct scavage{
 }scavaging;
 
 #define GARBAGE "thrash"
+#define THRASH_BUFFER_SIZE 256 * sizeof (I4)
 
 ////////////////////////////////////////////////////////////////////////////////        CHECK GARBAGE FILE       ////
 // CHECKS IF FILE EXISTS, AND RETURNS NUMBER OF 32BITS INT IN THE FILE
 I4 garbage_check(){
-
-    printf("\n\n    Checking garbage file   ....");
-
+    printf("\n\n    Checking garbage file   ....\n");
     I4 ints_count = 0;                     
     I4 bytes_count = 0;
     FILE *fp;
-
-    // check in file how much I4 there are
+    // check in file how many I4 there are
     fp=fopen(GARBAGE,"ab");                                            
     fseek(fp, 0, SEEK_END);
     bytes_count = ftell(fp);
@@ -28,38 +34,17 @@ I4 garbage_check(){
     ints_count = bytes_count / 4;
 
     printf("\nGARBAGE:    There are currently %u 4-Bytes INTEGERS in the file" , ints_count);
-    printf("\nFilesize %u Bytes" , bytes_count);
-
+    printf("\nFilesize %u Bytes\n" , bytes_count);
     return ints_count;
-}
-
-////////////////////////////////////////////////////////////////////////////////        DROP DATA IN THE THRASH      ////
-I4 garbage_drop_in_trash(I4 index){
-
-    printf("\n\n    DROPPING IN THRASH  ");
-    FILE *fp;
-    I4 idnex = index;
-
-    // write new index in garbage collection file
-    fp=fopen(GARBAGE,"ab");
-    if (fp == NULL) return 0;
-
-    fwrite(&idnex, sizeof (I4), 1, fp); 
-    printf("\n written in garbage collector: %u" , idnex);
-    fclose(fp);
-    return 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////        TAKE TRASH BIN AND TURN IT UPSIDE DOWN       ////
 void garbage_turn_bin(){
-
     printf("\n\n  Turning the trhash bin...\n");
-
     const I4 zise = garbage32count;
-
     FILE *fp=fopen(GARBAGE,"rb");      
     I4 current_integer = 0;
-
+    // print content of file
     for (I4 i = 0; i < zise; i++){
         fread(&current_integer, sizeof (I4), 1, fp);
         printf("%u ", current_integer);
@@ -68,39 +53,49 @@ void garbage_turn_bin(){
     fclose(fp);
 }
 
+////////////////////////////////////////////////////////////////////////////////        DROP DATA IN THE THRASH      ////
+I4 garbage_drop_in_trash(I4 index){
+    printf("\n\n    DROPPING IN THRASH  \n");
+    FILE *fp;
+    I4 idnex = index;
+    // write new index in garbage collection file
+    fp=fopen(GARBAGE,"ab");
+    if (fp == NULL) return 0;
+
+    fwrite(&idnex, sizeof (I4), 1, fp); 
+    fclose(fp);
+
+    printf("\n written in garbage collector: %u" , idnex);
+    garbage_turn_bin();
+    return 1;
+}
+
 ////////////////////////////////////////////////////////////////////////////////       GET SIZE AND POSITION OF DELETED ITEMS       ////
-void garbage_get_compost( I4 size_needed){
+void garbage_get_compost( I4 size_needed ){
 
-    // !!!!!!!!!!!! size needed is without [END]! in scavaging MUST be coun > 0 only if FOUND is COUNT+1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     printf("\n\n    GARBAGE CHECK FOR FREE SPACE\n");
-
     const I4 I4count = garbage32count;
-
     I4 size_found = 1;                                          // size needed will be at least 2 [I4][END], more is better memory and speed..
     I4 current_integer = 0;
     I4 last_integer = SOMETHING_WENT_WRONG - 1;
-
+    // reset
     scavaging.index_data_file = 0;
     scavaging.index_garbage_file = 0;
     scavaging.count = 0;
     
     FILE *fp =fopen(GARBAGE,"rb");
-    
     if(fp == NULL)  fprintf(stderr, "error opening file: %s #RUNNING %s at line # %d\n", GARBAGE, __FILE__, __LINE__ - 1);
 
     // having the file sorted..
     for (I4 i = 0; i < I4count; i++){
-
         // collecting a current_integer from file
         fread(&current_integer, sizeof (I4), 1, fp);
-        
         // check if the last 2 integer are in serie ...[70][79]85] [98][99]..
         if(current_integer == last_integer +1){
             size_found++;
         }else{
             size_found = 1;
         }
-
         // remember current integer for next loop
         last_integer = current_integer;
 
@@ -130,18 +125,18 @@ I4 garbage_memory_allocated(){
     FILE *fp = fopen(GARBAGE,"rb");
     if(fp == NULL)  fprintf(stderr, "error opening file: %s #RUNNING %s at line # %d\n", GARBAGE, __FILE__, __LINE__ - 1);
 
-    I4 *empty_trash_bin = malloc(256 * sizeof (I4));
+    I4 *empty_trash_bin = malloc( THRASH_BUFFER_SIZE );
     I4 current_integer = 0;
+    I4 i = 0;
 
-    for (I4 i = 0; i < garbage32count; i++){
+    for ( i = 0; i < garbage32count; i++){
         fread(&current_integer , sizeof(I4) , 1 , fp);
         empty_trash_bin[i] = current_integer;
     }
     fclose(fp);
 
-    fp = fopen(GARBAGE,"wb");
-    I4 i = 0;
     printf("\nIntegers remaining in garbage collection file\n");
+    fp = fopen(GARBAGE,"wb");
     // collect everything until [<-][<-][<-][<-] [index]
     for ( i = 0; i < index; i++ ){
         printf("(%u) " , empty_trash_bin[i]);
@@ -154,11 +149,10 @@ I4 garbage_memory_allocated(){
         printf("(%u)" , empty_trash_bin[i]);
         fwrite(&empty_trash_bin[i], sizeof (I4), 1, fp); 
     }
-
-    free(empty_trash_bin);
-    garbage32count -= counz;
     fclose(fp);
+    free(empty_trash_bin);
 
+    garbage32count -= counz;
     printf("\nCount of I4 in garbage collection file: %u \n" , garbage32count);
     return garbage32count;
 }
@@ -167,14 +161,12 @@ I4 garbage_memory_allocated(){
 I4 garbage_sort(){
 
     const I4 size = garbage32count;
-
     printf("\n\n    GARBAGE SORTING  -> %u elements \n" , size);
     if(size == 0)  return 0;                                                    
 
-    I4 *empty_trash_bin = malloc(256 * sizeof (I4));
+    I4 *empty_trash_bin = malloc( THRASH_BUFFER_SIZE );
     I4 current_integer = 0;
     FILE *fp = fopen(GARBAGE,"rb");
-    
     if(fp == NULL) return 0;
 
     // LOAD FILE
@@ -197,8 +189,8 @@ I4 garbage_sort(){
     }
     fclose(fp);
 
+    // returning higest number
     I4 max = empty_trash_bin[size];
     free(empty_trash_bin);
-
     return max;
 }
