@@ -384,12 +384,11 @@ int main() {
     printf("    8 Hundered \n");
     printf("    2 times 10 \n");
     printf("    and 3 Units \n");
-    printf("\n\n    That has a reason, and to know it you need to contact the creator of all this and offer a relatable amount of money\n\n\n");
+    printf("\n\n    That has a reason, and to know it you need to contact the creator of all this and offer a relatable amount of money\n\n");
 
     int32count = epathy_check();
     garbage32count = garbage_check();
-
-    //print_whole_file(FILENAME ,int32count);
+    // arrays
     I4* file_buffer = malloc( _1GB ); 
     I4* ends_buffer = malloc( sizeof (I4) * 256 );     
     I4* path_buffer = malloc( sizeof (I4) * 256 );
@@ -441,12 +440,11 @@ int main() {
     begin = get_node_begin(file_buffer , begin);                                        // whats filebuffer[begin] ->* points to 
     get_path(file_buffer, path_buffer , begin );                                        // print path from that --> *[begin]
 
-
     // #free_heap
     free(file_buffer);
     free(ends_buffer);
     free(path_buffer);
     free(new_data_or_nodes);
 
-   return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
