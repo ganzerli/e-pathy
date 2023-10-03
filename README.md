@@ -3,7 +3,7 @@ e-pathy saves integers (also in a file) in a way that you can find them followin
 
 e-pathy is a database shaped as a graph, where you can navigate throught paths and save data in branches, or create other branches in branches.
 
-The goal of the project is to have an extremely fast research, and save memory.
+The goal of the project is to have an extremely fast search, and save memory.
 
 There is a garbage collection: when you delete data the locations are written in a file, adding new data, if the count is available, are written in deleted spots.
 
