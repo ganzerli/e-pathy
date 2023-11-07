@@ -8,22 +8,33 @@ typedef u_int32_t  I4;
 #define SOMETHING_WENT_WRONG    0b11111111111111111111111111111111
 #include "garbage_collection.c"
 
+
 #define FILENAME "file"
 #define _1GB 1073741823
+#define FILESIZE _1GB / 2       // 500 MB
 
 #define NODE_SKELETON           0b11000000000000000000000000000000
 #define DATA_SKELETON           0b01000000000000000000000000000000
 #define END_SKELETON            0b00000000000000000000000000000000
 
-#define MAX_FILE_SIZE           ( SOMETHING_WENT_WRONG - 1024 )
+
 //  E R R O R S
 #define ERROR_1                 ( SOMETHING_WENT_WRONG - 1 )
 #define ERROR_2                 ( SOMETHING_WENT_WRONG - 2 )
 #define ERROR_3                 ( SOMETHING_WENT_WRONG - 3 )
 #define ERROR_4                 ( SOMETHING_WENT_WRONG - 4 )
 
+
 // global variables
 I4 int32count = 0;
+
+
+// PARTS OF THE PROGRAM
+
+#include "instructions.c"
+#include "server.c"
+
+
 
 // I know, I know.. and i even like Javascript...
 ////////////////////////////////////////////////////////////////////////////////        IS END       ////
@@ -59,7 +70,7 @@ I4 require_memory(I4 amount, I4 limit){
         return scavaging.index_data_file;                                           // return the index for this file
     }
     // SOMETHING FOR SCALABILITY
-    if(limit > MAX_FILE_SIZE){
+    if(limit > FILESIZE){
         // CHECK FOR NEW FILE
     }
     return limit;                                                                   // if nothing in thrash
@@ -384,67 +395,27 @@ int main() {
     printf("    8 Hundered \n");
     printf("    2 times 10 \n");
     printf("    and 3 Units \n");
-    printf("\n\n    That has a reason, and to know it you need to contact the creator of all this and offer a relatable amount of money\n\n");
+    printf("\n\n    That has a reason, and to know it you need to contact the creator of all this and offer a relatable amount of money\n\n\n");
 
     int32count = epathy_check();
     garbage32count = garbage_check();
-    // arrays
-    I4* file_buffer = malloc( _1GB ); 
+
+    //print_whole_file(FILENAME ,int32count);
+    I4* file_buffer = malloc( FILESIZE ); 
     I4* ends_buffer = malloc( sizeof (I4) * 256 );     
     I4* path_buffer = malloc( sizeof (I4) * 256 );
 
     load_file(file_buffer,FILENAME,int32count);
 
-// SOME INPUT
-    I4* new_data_or_nodes = malloc(sizeof(I4) * 128);
-    new_data_or_nodes[0] = NODE_SKELETON;
-    new_data_or_nodes[1] = 0b01010101010101010101010101010101;
-    new_data_or_nodes[2] = 0b01010101010101010101010101010101;
-    new_data_or_nodes[3] = 0b01010101010101010101010101010101;
-    new_data_or_nodes[4] = END_SKELETON;
-//  END SOME INPUT
-    
-    I4 begin = 0;
-    I4 n_breaks = 0;
 
-    // ADD node or data to a path [begin*]
-    if( 0 ){
-       int32count = add_node_or_data_to( file_buffer, begin, NODE_SKELETON );
-       save(FILENAME , file_buffer , int32count);
-    }
 
-    // INIT first uninitialized node [NODE_SKELETON] found in path from [begin*] and add array of new data or nodes
-    if( 0 ){
-        n_breaks = find_ENDs( file_buffer , ends_buffer , begin );                      // needed to know when to jump where
-        init_node_in_path( file_buffer, begin, ends_buffer, n_breaks, new_data_or_nodes );
-        save(FILENAME , file_buffer , int32count);
-    }
-    
-    // PRINTING    
-    begin = 0; // whatever is the path to print
-    begin = get_node_begin(file_buffer , begin);                                        // whats filebuffer[begin] ->* points to 
-    get_path(file_buffer, path_buffer , begin );                                        // print path from that --> *[begin]
 
-    I4 todelete = 5;
-    // DELETE
-    if( 0 ){
-        n_breaks = find_ENDs( file_buffer , ends_buffer , begin );                      // needed for delete
-        if ( delete(file_buffer , ends_buffer[n_breaks-1] ,  todelete ) ){
-            garbage_sort();
-            save(FILENAME , file_buffer , int32count);
-        }
-    }
 
-    // PRINTING    
-    begin = 0; // whatever is the path to print
-    begin = get_node_begin(file_buffer , begin);                                        // whats filebuffer[begin] ->* points to 
-    get_path(file_buffer, path_buffer , begin );                                        // print path from that --> *[begin]
 
     // #free_heap
     free(file_buffer);
     free(ends_buffer);
     free(path_buffer);
-    free(new_data_or_nodes);
 
-    return EXIT_SUCCESS;
+   return EXIT_SUCCESS;
 }
