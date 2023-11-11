@@ -27,6 +27,7 @@ typedef u_int32_t  I4;
 
 // global variables
 I4 int32count = 0;
+I4 file_buffer[FILESIZE];
 
 
 // PARTS OF THE PROGRAM
@@ -401,21 +402,15 @@ int main() {
     garbage32count = garbage_check();
 
     //print_whole_file(FILENAME ,int32count);
-    I4* file_buffer = malloc( FILESIZE ); 
-    I4* ends_buffer = malloc( sizeof (I4) * 256 );     
-    I4* path_buffer = malloc( sizeof (I4) * 256 );
+
+    // those coulb be useful somewhere else...
+    I4 ends_buffer[256];   
+    I4 path_buffer[256];
 
     load_file(file_buffer,FILENAME,int32count);
 
-
-
-
-
-
-    // #free_heap
-    free(file_buffer);
-    free(ends_buffer);
-    free(path_buffer);
+   //  get parse execute commands, send data
+   //  ...
 
    return EXIT_SUCCESS;
 }
