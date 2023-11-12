@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
  // 4 bytes integer
-typedef u_int32_t  I4;    
+typedef u_int32_t  u32;    
 #include "tools.c"
 
 #define SOMETHING_WENT_WRONG    0b11111111111111111111111111111111
@@ -26,8 +26,8 @@ typedef u_int32_t  I4;
 
 
 // global variables
-I4 int32count = 0;
-I4 file_buffer[FILESIZE];
+u32 int32count = 0;
+u32 file_buffer[FILESIZE];
 
 
 // PARTS OF THE PROGRAM
@@ -39,28 +39,28 @@ I4 file_buffer[FILESIZE];
 
 // I know, I know.. and i even like Javascript...
 ////////////////////////////////////////////////////////////////////////////////        IS END       ////
-unsigned int is_END(I4 num){
+unsigned int is_END(u32 num){
    return  ( 0b00111111111111111111111111111111 | num ) == 0b00111111111111111111111111111111;
 }
 ////////////////////////////////////////////////////////////////////////////////        IS NODE       ////
-unsigned int is_NODE(I4 num){
+unsigned int is_NODE(u32 num){
    return  ( 0b00111111111111111111111111111111 | num ) == 0b11111111111111111111111111111111;
 }
 ////////////////////////////////////////////////////////////////////////////////        IS DATA      ////
-unsigned int is_DATA(I4 num){
+unsigned int is_DATA(u32 num){
    return  ( 0b00111111111111111111111111111111 | num ) == 0b01111111111111111111111111111111;
 }
 
 ////////////////////////////////////////////////////////////////////////////////        TRIM FIRST 2 BITS       ////
-I4 trim_first_2_bits(I4 data){
-    I4 trimmed = 0;
-    I4 mask = 0b00111111111111111111111111111111;
+u32 trim_first_2_bits(u32 data){
+    u32 trimmed = 0;
+    u32 mask = 0b00111111111111111111111111111111;
     trimmed = data & mask;
     return trimmed;
 }
 
 ////////////////////////////////////////////////////////////////////////////////        REQUIRE MEMORY       ////
-I4 require_memory(I4 amount, I4 limit){
+u32 require_memory(u32 amount, u32 limit){
     garbage_turn_bin();                                                             // Look in garbage
     garbage_get_compost( amount );                                                  // watch if somthing useful
 
@@ -79,10 +79,10 @@ I4 require_memory(I4 amount, I4 limit){
 
 ////////////////////////////////////////////////////////////////////////////////        CHECK FILE       ////
 // CHECKS IF FILE EXISTS, AND RETURNS NUMBER OF 32BITS INT IN THE FILE
-I4 epathy_check(){
-    I4 ints_count = 0;                     
-    I4 bytes_count = 0;
-    I4 const end_skeleton = END_SKELETON;
+u32 epathy_check(){
+    u32 ints_count = 0;                     
+    u32 bytes_count = 0;
+    u32 const end_skeleton = END_SKELETON;
     FILE *fp;
 
     fp=fopen(FILENAME,"ab");                                            
@@ -95,7 +95,7 @@ I4 epathy_check(){
     if(bytes_count  == 0){
       
         fp=fopen(FILENAME,"ab");   
-        fwrite(&end_skeleton, sizeof (I4), 1, fp);
+        fwrite(&end_skeleton, sizeof (u32), 1, fp);
 
         ints_count++;    
         fclose(fp);
@@ -112,40 +112,40 @@ I4 epathy_check(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////        SAVE IN FILE       ////
-void save(char *filepath , I4* newbuffer , I4 count ){
-    I4 curren_integer = 0;
+void save(char *filepath , u32* newbuffer , u32 count ){
+    u32 curren_integer = 0;
     FILE *fp =fopen(filepath,"wb");
     if(fp == NULL)  fprintf(stderr, "error opening file: %s #RUNNING %s at line # %d\n", FILENAME, __FILE__, __LINE__ - 1);
     
     // write the file with new paths
-    for (I4 i = 0; i < count; i++){
+    for (u32 i = 0; i < count; i++){
         curren_integer = newbuffer[i];
-        fwrite(&curren_integer, sizeof (I4), 1, fp);
+        fwrite(&curren_integer, sizeof (u32), 1, fp);
     }
     fclose(fp);
 }
 
 ////////////////////////////////////////////////////////////////////////////////        LOAD FILE       ////
-void load_file(I4* buffer, char* filename , I4 count){
-    I4 curren_integer = 0;
+void load_file(u32* buffer, char* filename , u32 count){
+    u32 curren_integer = 0;
     FILE *fp =fopen(filename,"rb");
     if(fp == NULL)  fprintf(stderr, "error opening file: %s #RUNNING %s at line # %d\n", filename, __FILE__, __LINE__ - 1);
 
     // save every INT32 from the file in the buffer
-    for (I4 i = 0; i < count; i++){
-        fread(&curren_integer, sizeof (I4), 1, fp);
+    for (u32 i = 0; i < count; i++){
+        fread(&curren_integer, sizeof (u32), 1, fp);
         buffer[i] = curren_integer;   
     }
     fclose(fp);
 }
                                                                                 
 ////////////////////////////////////////////////////////////////////////////////        FIND ENDS       ////
-I4 find_ENDs( I4* filebuffer , I4* ENDsbuffer , I4 path_begin ){
-    I4 ends = 1;
-    I4 end = 0;
-    I4 i = path_begin;
+u32 find_ENDs( u32* filebuffer , u32* ENDsbuffer , u32 path_begin ){
+    u32 ends = 1;
+    u32 end = 0;
+    u32 i = path_begin;
     unsigned char exit = 0;
-    I4 END_points_to = 0;
+    u32 END_points_to = 0;
 
     printf("\n   Finding ENDs from branch [%d]\n\n", path_begin);
 
@@ -178,8 +178,8 @@ I4 find_ENDs( I4* filebuffer , I4* ENDsbuffer , I4 path_begin ){
 
 ////////////////////////////////////////////////////////////////////////////////        CHECK FOR SPACE RIGHT AFTER       ////
 // BEEING AT POSITION is_END()
-I4 if_space_after(I4 position , I4* filebuffer , I4 limit){
-    I4 result = 0;
+u32 if_space_after(u32 position , u32* filebuffer , u32 limit){
+    u32 result = 0;
     //  if it is the END OF THE FILE
     if(position == limit -1) return limit-1;
     // BEEING AT POSITION is_END() if there is just place after it
@@ -188,14 +188,14 @@ I4 if_space_after(I4 position , I4* filebuffer , I4 limit){
 }
 
 ////////////////////////////////////////////////////////////////////////////////        ADD NODE TO       ////
-I4 add_node_or_data_to(I4* filebuffer , I4 path_begin , I4 new_node_or_data){
+u32 add_node_or_data_to(u32* filebuffer , u32 path_begin , u32 new_node_or_data){
 
-    I4 i = path_begin;
+    u32 i = path_begin;
     unsigned char stop = 0;
-    I4 check = 0;
-    I4 available_memory_at = 0;
-    I4 END_points_to = 0;
-    I4 limit = int32count;                                                          // first keep global variable as is
+    u32 check = 0;
+    u32 available_memory_at = 0;
+    u32 END_points_to = 0;
+    u32 limit = int32count;                                                          // first keep global variable as is
 
     printf("\n   Adding Node in branch [%u]\n\n", path_begin );
 
@@ -256,13 +256,13 @@ I4 add_node_or_data_to(I4* filebuffer , I4 path_begin , I4 new_node_or_data){
 }
 
 /////// !! array NEW DATA OR NODES NEEDS TO END WITH [END_SKELETON] !! /////////        INIT NODE IN PATH       ////
-I4 init_node_in_path(I4* filebuffer, I4 path_begin,  I4 *ENDs, I4 ends, I4 *new_data_nodes){
+u32 init_node_in_path(u32* filebuffer, u32 path_begin,  u32 *ENDs, u32 ends, u32 *new_data_nodes){
     
     printf("\n\n    init_node_in_path:\n\n");
-    I4 found_and_initialized = SOMETHING_WENT_WRONG;                                // flag to exit if nothing found
-    I4 i = path_begin;                                                              // set i at filebuffer[path_begin]
-    I4 branch_break = 0;                                                            // set brunch_break at first [END] of ENDs buffer
-    I4 filebuffer_count = int32count;                                               // keep first int32count global variable there 
+    u32 found_and_initialized = SOMETHING_WENT_WRONG;                                // flag to exit if nothing found
+    u32 i = path_begin;                                                              // set i at filebuffer[path_begin]
+    u32 branch_break = 0;                                                            // set brunch_break at first [END] of ENDs buffer
+    u32 filebuffer_count = int32count;                                               // keep first int32count global variable there 
 
     while(i < ENDs[ends-1]){                                                        // [END] of the branch
         printf("filebuffer[%u] = %u\n", i , filebuffer[i]);
@@ -293,8 +293,8 @@ I4 init_node_in_path(I4* filebuffer, I4 path_begin,  I4 *ENDs, I4 ends, I4 *new_
     printf("in fielbuffer[%u] the data is: [%u]\n", found_and_initialized, filebuffer[found_and_initialized]);
     printf("inititalizing node.....\n\n");
     // find space
-    I4 count = 0;
-    I4 memory_position = filebuffer_count;
+    u32 count = 0;
+    u32 memory_position = filebuffer_count;
 
     while(new_data_nodes[count] != END_SKELETON){
         count ++;
@@ -319,9 +319,9 @@ I4 init_node_in_path(I4* filebuffer, I4 path_begin,  I4 *ENDs, I4 ends, I4 *new_
 }
 
 ////////////////////////////////////////////////////////////////////////////////        GET BEGIN FROM NODE       ////
-I4 get_node_begin( I4* filebuffer, I4 node){
+u32 get_node_begin( u32* filebuffer, u32 node){
     printf("\n\n     Node begin\n\n");
-    I4 node_begin = 0;
+    u32 node_begin = 0;
     node_begin = filebuffer[node];                                                      // look in the node
     node_begin = trim_first_2_bits(node_begin);                                         // get only the data (trim type)
 
@@ -330,13 +330,13 @@ I4 get_node_begin( I4* filebuffer, I4 node){
 }
 
 ////////////////////////////////////////////////////////////////////////////////        GET PATH FROM BEGIN       ////
-I4 get_path( I4* filebuffer, I4* path_buffer, I4 node_begin){
+u32 get_path( u32* filebuffer, u32* path_buffer, u32 node_begin){
 
     printf("\n\n     Get path\n\n");
     printf("node begin : %u  , filebuffer[node_begin] = %u\n", node_begin, filebuffer[node_begin]);
 
-    I4 i = node_begin;
-    I4 count = 0;
+    u32 i = node_begin;
+    u32 count = 0;
 
     while( filebuffer[i] != END_SKELETON){
         if(is_END(filebuffer[i])){                                                      // other [END] or brake [p*]
@@ -356,15 +356,15 @@ I4 get_path( I4* filebuffer, I4* path_buffer, I4 node_begin){
 }
 
 ////////////////////////////////////////////////////////////////////////////////        DELETE DATA       ////
-I4 delete(I4* file_buffer , I4 i_end , I4 i_ndex ){
+u32 delete(u32* file_buffer , u32 i_end , u32 i_ndex ){
 
-    I4 result = is_DATA(file_buffer[i_ndex]);
+    u32 result = is_DATA(file_buffer[i_ndex]);
     if(!result){
         printf("\n\n     DELETING \nfilebuffer[%u] IS NOT TYPE DATA\n", i_ndex);
         return result;
     } 
 
-    I4 data = trim_first_2_bits(file_buffer[i_ndex]);                                   // gat only the data (trim type)
+    u32 data = trim_first_2_bits(file_buffer[i_ndex]);                                   // gat only the data (trim type)
     // writing the last element of the branch in the element to delete
     file_buffer[ i_ndex ] = file_buffer[ i_end - 1 ];
     // set an END_SKELETON to that last element, that is now in the place of the deleted element
@@ -400,12 +400,6 @@ int main() {
 
     int32count = epathy_check();
     garbage32count = garbage_check();
-
-    //print_whole_file(FILENAME ,int32count);
-
-    // those coulb be useful somewhere else...
-    I4 ends_buffer[256];   
-    I4 path_buffer[256];
 
     load_file(file_buffer,FILENAME,int32count);
 
