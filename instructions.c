@@ -25,15 +25,6 @@ and basically nothing else..
 u32 ends_buffer[256];   
 u32 path_buffer[256];
 
-
-// SOME INPUT
-    u32 new_data_or_nodes[5];
-    new_data_or_nodes[0] = NODE_SKELETON;
-    new_data_or_nodes[1] = 0b01010101010101010101010101010101;
-    new_data_or_nodes[2] = 0b01010101010101010101010101010101;
-    new_data_or_nodes[3] = 0b01010101010101010101010101010101;
-    new_data_or_nodes[4] = END_SKELETON;
-//  END SOME INPUT
     
 u32 begin = 0;
 u32 n_breaks = 0;
@@ -46,7 +37,18 @@ u32 add_to_path(u32 path_begin , u32 data){
 // }
 }
 
+
 // // INIT first uninitialized node [NODE_SKELETON] found in path from [begin*] and add array of new data or nodes
+
+// // SOME INPUT
+//     u32 new_data_or_nodes[5];
+//     new_data_or_nodes[0] = NODE_SKELETON;
+//     new_data_or_nodes[1] = 0b01010101010101010101010101010101;
+//     new_data_or_nodes[2] = 0b01010101010101010101010101010101;
+//     new_data_or_nodes[3] = 0b01010101010101010101010101010101;
+//     new_data_or_nodes[4] = END_SKELETON;
+// //  END SOME INPUT
+
 // if( 0 ){
 //     n_breaks = find_ENDs( file_buffer , ends_buffer , begin );                      // needed to know when to jump where
 //     init_node_in_path( file_buffer, begin, ends_buffer, n_breaks, new_data_or_nodes );
@@ -54,7 +56,8 @@ u32 add_to_path(u32 path_begin , u32 data){
 // }
 
 
-u32 delete(u32 index){
+
+u32 del(u32 index){
 // u32 todelete = 5;
 // // DELETE
 // if( 0 ){
@@ -64,7 +67,7 @@ u32 delete(u32 index){
 //         save(FILENAME , file_buffer , int32count);
 //     }
 // }
-    return trim_first_2_bits( file_buffer[index] )
+    return trim_first_2_bits( file_buffer[index] );
 }
 
 // lodaing path in path buffer

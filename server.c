@@ -127,7 +127,8 @@ int epathy_listen( char* port , unsigned int queue ){
                 exit(0);
         }
         close(new_fd);                                                              // parent doesn't need this
-        str_unset(buffer, size);
+        //str_unset(buffer, size);
+        buffer[0] = '\0';
     }
     return 1;
 }
