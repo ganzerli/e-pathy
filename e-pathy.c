@@ -1,15 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define SOMETHING_WENT_WRONG    0xFFFFFFFF  //11111111111111111111111111111111
+
+#define FILENAME "file"
+
+#define NODE_SKELETON           0xC0000000  //11000000000000000000000000000000
+#define DATA_SKELETON           0x40000000  //01000000000000000000000000000000
+#define END_SKELETON            0x00000000  //00000000000000000000000000000000
+#define RAW_DATA                0x80000000  //10000000000000000000000000000000
+
+//  E R R O R S
+#define ERROR_1                 ( SOMETHING_WENT_WRONG - 1 )
+#define ERROR_2                 ( SOMETHING_WENT_WRONG - 2 )
+#define ERROR_3                 ( SOMETHING_WENT_WRONG - 3 )
+#define ERROR_4                 ( SOMETHING_WENT_WRONG - 4 )
+
 #define _1GB 1073741823
-#define FILESIZE _1GB / 2       // 500 MB
+#define FILESIZE _1GB / 5       // 200 MB
+
+ // 4 bytes integer
+typedef u_int32_t  u32;  
 
 // global variables
 u32 int32count = 0;
-u32 file_buffer[FILESIZE];
-
- // 4 bytes integer
-typedef u_int32_t  u32;   
+u32 *file_buffer;
  
 #include "tools.c"
 #include "garbage_collection.c"
@@ -39,10 +54,15 @@ int main() {
     int32count = epathy_check();
     garbage32count = garbage_check();
 
+    file_buffer = malloc(FILESIZE);
+
     load_file(file_buffer,FILENAME,int32count);
 
    //  get parse execute commands, send data
    //  ...
 
+    add_to_path(0 , NODE_SKELETON);
+    free(file_buffer);
+   
    return EXIT_SUCCESS;
 }

@@ -1,39 +1,24 @@
-
-#define SOMETHING_WENT_WRONG    0b11111111111111111111111111111111
-
-
-#define FILENAME "file"
-
-#define NODE_SKELETON           0b11000000000000000000000000000000
-#define DATA_SKELETON           0b01000000000000000000000000000000
-#define END_SKELETON            0b00000000000000000000000000000000
-
-
-//  E R R O R S
-#define ERROR_1                 ( SOMETHING_WENT_WRONG - 1 )
-#define ERROR_2                 ( SOMETHING_WENT_WRONG - 2 )
-#define ERROR_3                 ( SOMETHING_WENT_WRONG - 3 )
-#define ERROR_4                 ( SOMETHING_WENT_WRONG - 4 )
-
-
-// I know, I know.. and i even like Javascript...
 ////////////////////////////////////////////////////////////////////////////////        IS END       ////
 unsigned int is_END(u32 num){
-   return  ( 0b00111111111111111111111111111111 | num ) == 0b00111111111111111111111111111111;
+            //  00111111111111111111111111111111        00111111111111111111111111111111
+   return  (    0x3FFFFFFF | num )          ==          0x3FFFFFFF;
 }
 ////////////////////////////////////////////////////////////////////////////////        IS NODE       ////
 unsigned int is_NODE(u32 num){
-   return  ( 0b00111111111111111111111111111111 | num ) == 0b11111111111111111111111111111111;
+            //  00111111111111111111111111111111        11111111111111111111111111111111
+   return  (    0x3FFFFFFF | num )          ==          0xFFFFFFFF;
 }
 ////////////////////////////////////////////////////////////////////////////////        IS DATA      ////
 unsigned int is_DATA(u32 num){
-   return  ( 0b00111111111111111111111111111111 | num ) == 0b01111111111111111111111111111111;
+            //  00111111111111111111111111111111        01111111111111111111111111111111
+   return  (    0x3FFFFFFF | num )          ==          0x7FFFFFFF;
 }
 
 ////////////////////////////////////////////////////////////////////////////////        TRIM FIRST 2 BITS       ////
 u32 trim_first_2_bits(u32 data){
     u32 trimmed = 0;
-    u32 mask = 0b00111111111111111111111111111111;
+    //         00111111111111111111111111111111
+    u32 mask = 0x3FFFFFFF;
     trimmed = data & mask;
     return trimmed;
 }

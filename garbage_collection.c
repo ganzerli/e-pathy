@@ -7,7 +7,7 @@
 // updates the thrash file
 
 // GLOBAL VARIABLES
-u32 garbage32count = 0;
+u32 garbage32count;
 
 struct scavage{
     u32 index_data_file;
