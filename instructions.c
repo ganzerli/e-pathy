@@ -65,10 +65,10 @@ u32 del(u32 index){
 // lodaing path in path buffer
 // having 0 prints the root branch
 // example: running path() again for every data found (hope is all nodes) will be displayed the first layer of the graph
-u32* path(u32 path_begin){
+u32* path(u32 selected_node){
 // PRINTING    
-    begin = 0; // whatever is the path to print
-    begin = get_node_begin(file_buffer , begin);                                        // whats filebuffer[begin] ->* points to 
-    get_path(file_buffer, path_buffer , begin );                                        // print path from that --> *[begin]
+    u32 node_begin = 0;
+    node_begin = get_node_begin(file_buffer , selected_node);                                // what filebuffer[begin] ->* points to 
+    get_path(file_buffer, path_buffer , node_begin );                                        // print path from that --> *[begin]
     return path_buffer;
 }

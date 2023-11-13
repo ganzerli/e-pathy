@@ -96,7 +96,7 @@ int epathy_listen( char* port , unsigned int queue ){
 
     // web framework
     unsigned int size;
-    char result;
+    int result;
     char buffer[1024*1024];
 
     while (1){                                                                      // accepting, waiting connections
@@ -111,8 +111,6 @@ int epathy_listen( char* port , unsigned int queue ){
                     s,
                     sizeof s
                 );
-        
-        printf("server: got connection from %s\n", s);
 
         // manage request
         result = recv(new_fd, buffer, (1024*1024), 0);
