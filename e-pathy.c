@@ -17,7 +17,7 @@
 #define ERROR_4                 ( SOMETHING_WENT_WRONG - 4 )
 
 #define _1GB 1073741823
-#define FILESIZE _1GB / 5       // 200 MB
+#define FILESIZE _1GB / 5       // 256 MB
 
  // 4 bytes integer
 typedef u_int32_t  u32;  
@@ -25,7 +25,7 @@ typedef u_int32_t  u32;
 // global variables
 u32 int32count = 0;
 u32 *file_buffer;
- 
+#include "alphabet.c"
 #include "tools.c"
 #include "garbage_collection.c"
 
@@ -53,18 +53,20 @@ int main() {
 
     int32count = epathy_check();
     garbage32count = garbage_check();
-
     file_buffer = malloc(FILESIZE);
 
     load_file(file_buffer,FILENAME,int32count);
 
+    //printf("file_buffer :%u", file_buffer[0]);
+
    //  get parse execute commands, send data
    //  ...
 
-    add_to_path(0 , NODE_SKELETON);
+    //add_to_path(0 , NODE_SKELETON);
 
-    free(file_buffer);
+    
     epathy_listen("8680",1);
-   
+    free(file_buffer);
+
    return EXIT_SUCCESS;
 }

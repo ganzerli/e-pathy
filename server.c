@@ -94,7 +94,7 @@ int epathy_listen( char* port , unsigned int queue ){
         return 0;
     }
 
-    // web framework
+    // execute instructions
     unsigned int size;
     int result;
     char buffer[1024*1024];
@@ -119,14 +119,14 @@ int epathy_listen( char* port , unsigned int queue ){
         
         if (!fork()) {                                                              // this is the child process
             close(sockfd);                                                          // child doesn't need the listener
-            if (send(new_fd, buffer, size, 0) == -1)
+            if (write(new_fd, buffer, size) == -1)
                 perror("send");
                 close(new_fd);
                 exit(0);
         }
         close(new_fd);                                                              // parent doesn't need this
         //str_unset(buffer, size);
-        buffer[0] = '\0';
+        
     }
     return 1;
 }

@@ -28,7 +28,7 @@ u32 path_buffer[256];
 u32 begin = 0;
 u32 n_breaks = 0;
 
-//ADD node or data to a path [begin*]
+//ADD node (or data -> deprecating) to a path [begin*]
 u32 add_to_path(u32 path_begin , u32 data){
     add_node_or_data_to( file_buffer, path_begin, data );
     save(FILENAME , file_buffer , int32count);
@@ -65,10 +65,10 @@ u32 del(u32 index){
 // lodaing path in path buffer
 // having 0 prints the root branch
 // example: running path() again for every data found (hope is all nodes) will be displayed the first layer of the graph
-u32* path(u32 selected_node){
+u32 path(u32 selected_node){
 // PRINTING    
     u32 node_begin = 0;
     node_begin = get_node_begin(file_buffer , selected_node);                                // what filebuffer[begin] ->* points to 
-    get_path(file_buffer, path_buffer , node_begin );                                        // print path from that --> *[begin]
-    return path_buffer;
+    u32 count = get_path(file_buffer, path_buffer , node_begin );                            // print path from that --> *[begin]
+    return count;
 }
