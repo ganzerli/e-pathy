@@ -10,9 +10,8 @@
 unsigned int execute_instruction(char* buffer , unsigned int size){
 
     unsigned int response_size = 0;
-
     u32 *query = (u32*)buffer;
-    u32 *resbf = (u32*)buffer;
+    char *resbf = buffer;
 
     // see query table.. when it exists
     u32 instruction = query[0];
@@ -35,7 +34,7 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         // 2 = GET PATH
         case 2:
             response_size = path(where) * sizeof(u32);
-            buffer = path_buffer;
+            resbf = (char*)path_buffer;
             printf("response size:%u", response_size);
         break;
 
@@ -43,19 +42,11 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         //str_cpy( resbf, "DEFAULT!!");
         //response_size = str_len(resbf);
     }
-    
-    printf("\nno errors!");
-    
-    //buffer = resbf;
 
     for(u32 i = 0; i < response_size; i++){
-        printf("\n that -> %0x", resbf[i] );
-        printf("\n that bf -> %0x\n", buffer[i] );
-
+        buffer[i] = resbf[i];
+        printf("that -> %0x", buffer[i]);
     }
-
-
-
 
     return response_size;
 }
