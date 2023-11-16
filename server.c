@@ -10,7 +10,6 @@
 
 #include "execute_instruction.c"
 
-
 void sigchld_handler(int s){
     // waitpid() might overwrite errno, so we save and restore it:
     int saved_errno = errno;

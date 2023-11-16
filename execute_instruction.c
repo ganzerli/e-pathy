@@ -9,43 +9,60 @@
 // getting instruction from relacy, execute it and send result
 unsigned int execute_instruction(char* buffer , unsigned int size){
 
-    unsigned int response_size = 0;
+    u32 response_size = 0;
+    const u32 zise = size / sizeof(u32); 
     u32 *query = (u32*)buffer;
     char *resbf = buffer;
 
     // see query table.. when it exists
     u32 instruction = query[0];
     u32 where = query[1];
-    u32 what = query[2];
+    u32 count = query[2];
     u32 options = query[3];
+    // .. data[][][][][][]...
 
-    printf("\n%u\n%u\n%u\n%u", instruction, where, what, options);
+    //get starting point of all data
+    
+
+    printf("\ninstruction: %u\nwhere: %u\ncount: %u\noptions: %u", instruction, where, count, options);
+    
+    printf("\nDATA\n");
+
+    for(u32 i = 4; i < zise; i++){
+        printf("\ndata[%u] %0x", i ,query[i]);
+    }
+
 
     switch(instruction){
-        // 0 = NEW NODE
-        case 0:
-            
+        
+        case 0:// 0 = NEW NODE
+            add_to_path(where , NODE_SKELETON);
         break;
         
-        // 1 = ADD TO PATH
-        case 1:
+       
+        case 1: // 1 = ADD TO PATH
+
         break;
 
-        // 2 = GET PATH
-        case 2:
+        
+        case 2:// 2 = GET PATH
             response_size = path(where) * sizeof(u32);
-            resbf = (char*)path_buffer;
+            buffer = (char*)path_buffer;
             printf("response size:%u", response_size);
         break;
 
-        default:
-        //str_cpy( resbf, "DEFAULT!!");
-        //response_size = str_len(resbf);
-    }
+        
+        case 3:// 3 = DELETE
+        break;
 
-    for(u32 i = 0; i < response_size; i++){
-        buffer[i] = resbf[i];
-        printf("that -> %0x", buffer[i]);
+        default:
+        buffer[0] = 'E';
+        buffer[1] = 'R';
+        buffer[2] = 'R';
+        buffer[3] = 'O';
+        buffer[4] = 'R';
+
+        response_size = 5;
     }
 
     return response_size;

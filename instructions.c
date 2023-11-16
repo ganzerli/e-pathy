@@ -29,6 +29,7 @@ u32 begin = 0;
 u32 n_breaks = 0;
 
 //ADD node (or data -> deprecating) to a path [begin*]
+// data will be almost always NODE_SKELETON
 u32 add_to_path(u32 path_begin , u32 data){
     add_node_or_data_to( file_buffer, path_begin, data );
     save(FILENAME , file_buffer , int32count);
@@ -44,6 +45,16 @@ u32 add_to_path(u32 path_begin , u32 data){
 //     new_data_or_nodes[3] = 3;
 //     new_data_or_nodes[4] = END_SKELETON;
 // //  END SOME INPUT
+
+// having an unitialized node -NODE_SKELETON- in a path , 
+// walk throught the path, find that kind of node, search memory, assing the location in that node
+// and write the location of the first element in found NODE_SKELETON
+// COUNT is NOT NEEDED, but NEEDED IS END_SKELETON at LAST INDEX of dataArray
+u32 init_node( u32 branchBegin , u32* dataArray ){
+    n_breaks = find_ENDs( file_buffer , ends_buffer , branchBegin );                      // needed to know when to jump where
+    init_node_in_path( file_buffer, branchBegin, ends_buffer, n_breaks, dataArray );
+    save(FILENAME , file_buffer , int32count);
+}
 
 // if( 0 ){
 //     n_breaks = find_ENDs( file_buffer , ends_buffer , begin );                      // needed to know when to jump where
