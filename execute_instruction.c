@@ -15,28 +15,39 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
     char *resbf = buffer;
 
     // see query table.. when it exists
-    u32 instruction = query[0];
-    u32 where = query[1];
-    u32 count = query[2];
-    u32 options = query[3];
+    const u32 INSTRUCTION = query[0];
+    const u32 WHERE = query[1];                     // COUNT OF NODES TO REACH PATH
+    const u32 WHAT = query[2];                      // COUNT OF ELEMENTS TO ADD
+    const u32 OPTIONS = query[3];
+    const u32 COUNT = query[4];
     // .. data[][][][][][]...
-
-    //get starting point of all data
     
+    const u32 DATA_BEGIN = 5;
+    u32 data_where[WHERE] ,data_what[WHAT+1];
 
-    printf("\ninstruction: %u\nwhere: %u\ncount: %u\noptions: %u", instruction, where, count, options);
-    
-    printf("\nDATA\n");
-
-    for(u32 i = 4; i < zise; i++){
-        printf("\ndata[%u] %0x", i ,query[i]);
+    // FILLING ARRAY FOR PATH WHERE
+    for(u32 i = 0; i < WHERE; i++){
+        data_where[i] = query[DATA_BEGIN+i];
+        printf("\ndata_where[%u] %0x", i ,data_where[i]);
     }
 
+    // FILLING ARRAY WHAT WITH DATA 
+    for(u32 i = 0; i < WHAT; i++){
+        data_what[i] = query[DATA_BEGIN + WHERE + i];
+        printf("\ndata_what[%u] %0x", i ,data_what[i]);
+    }
 
-    switch(instruction){
+    printf("\nINSTRUCTION:%u \nOPTIONS: %u\ncount: %u", INSTRUCTION,OPTIONS,COUNT );
+    
+    switch(INSTRUCTION){
         
-        case 0:// 0 = NEW NODE
-            add_to_path(where , NODE_SKELETON);
+        case 0:// 0 = ADD NODE
+
+            // just adding to root
+            // add_to_path(WHERE , NODE_SKELETON);
+            // init_node(WHERE, &data[WHERE] );
+        
+           
         break;
         
        
@@ -46,7 +57,7 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
 
         
         case 2:// 2 = GET PATH
-            response_size = path(where) * sizeof(u32);
+            response_size = path(WHERE) * sizeof(u32);
             buffer = (char*)path_buffer;
             printf("response size:%u", response_size);
         break;
