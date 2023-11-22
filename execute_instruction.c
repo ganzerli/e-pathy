@@ -16,28 +16,28 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
 
     // see query table.. when it exists
     const u32 INSTRUCTION = query[0];
-    const u32 WHERE = query[1];                     // COUNT OF NODES TO REACH PATH
-    const u32 WHAT = query[2];                      // COUNT OF ELEMENTS TO ADD
+    const u32 WHERE_COUNT = query[1];                     // COUNT OF NODES TO REACH PATH
+    const u32 WHAT_COUNT = query[2];                      // COUNT OF ELEMENTS TO ADD
     const u32 OPTIONS = query[3];
-    const u32 COUNT = query[4];
+    const u32 PACKAGE_COUNT= query[4];
     // .. data[][][][][][]...
     
     const u32 DATA_BEGIN = 5;
-    u32 data_where[WHERE] ,data_what[WHAT+1];
+    u32 data_where[WHERE_COUNT] ,data_what[WHAT_COUNT+1];
 
-    // FILLING ARRAY FOR PATH WHERE
-    for(u32 i = 0; i < WHERE; i++){
+    // FILLING ARRAY FOR PATH WHERE_COUNT
+    for(u32 i = 0; i < WHERE_COUNT; i++){
         data_where[i] = query[DATA_BEGIN+i];
         printf("\ndata_where[%u] %0x", i ,data_where[i]);
     }
 
-    // FILLING ARRAY WHAT WITH DATA 
-    for(u32 i = 0; i < WHAT; i++){
+    // FILLING ARRAY WHAT_DWITH DATA 
+    for(u32 i = 0; i < WHAT_COUNT; i++){
         data_what[i] = query[DATA_BEGIN + WHERE + i];
         printf("\ndata_what[%u] %0x", i ,data_what[i]);
     }
 
-    printf("\nINSTRUCTION:%u \nOPTIONS: %u\ncount: %u", INSTRUCTION,OPTIONS,COUNT );
+    printf("\nINSTRUCTION:%u \nOPTIONS: %u\ncount: %u", INSTRUCTION,OPTIONS,PACKAGE_COUNT );
     
     switch(INSTRUCTION){
         
@@ -46,7 +46,6 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
             // just adding to root
             // add_to_path(WHERE , NODE_SKELETON);
             // init_node(WHERE, &data[WHERE] );
-        
            
         break;
         

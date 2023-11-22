@@ -144,7 +144,7 @@ u32 find_ENDs( u32* filebuffer , u32* ENDsbuffer , u32 path_begin ){
 // BEEING AT POSITION is_END()
 u32 if_space_after(u32 position , u32* filebuffer , u32 limit){
     u32 result = 0;
-    //  if it is the END OF THE FILE
+    //  if it is the END OF THE BUFFER -> nothing was written here before
     if(position == limit -1) return limit-1;
     // BEEING AT POSITION is_END() if there is just place after it
     if(filebuffer[position] == END_SKELETON && filebuffer[position+1] == END_SKELETON) return position;

@@ -62,10 +62,40 @@ int main() {
    //  get parse execute commands, send data
    //  ...
 
-    //add_to_path(0 , NODE_SKELETON);
+    add_to_path(0 , NODE_SKELETON);
+    u32 new_data_or_nodes[5];
+    new_data_or_nodes[0] = 0x0000E770;
+    new_data_or_nodes[1] = NODE_SKELETON;
+    new_data_or_nodes[2] = NODE_SKELETON;
+    new_data_or_nodes[3] = NODE_SKELETON;
+    new_data_or_nodes[4] = END_SKELETON;
+
+    init_node(0,new_data_nodes);
+
+    u32 path_count_ = path(0);
+
+    u32 buffer_[256];
+
+
+    // get every first element, in every node present in that path
+
+    void get_first(u32 count, u32 * buffer_){
+        u32 j = 0;
+        u32 node = 0;
+        for(u32 i = 0; i < count; i++){
+            if (path_buffer[i] != NODE_SKELETON){
+                node = trim_first_2_bits(path_buffer[i])
+                node = get_node_begin(file_buffer, node);
+                printf("first:->%u", node);
+                buffer_[j] = node;
+                j++;
+            }
+        }
+        return j;
+    }
 
     
-    epathy_listen("8680",1);
+    //epathy_listen("8680",1);
     free(file_buffer);
 
    return EXIT_SUCCESS;
