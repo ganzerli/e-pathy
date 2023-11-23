@@ -113,7 +113,7 @@ u32 find_ENDs( u32* filebuffer , u32* ENDsbuffer , u32 path_begin ){
 
     printf("\n   Finding ENDs from branch [%d]\n\n", path_begin);
 
-    while (!exit == 0){
+    while (exit == 0){
         printf("[%u] -> %u \n",i, filebuffer[i]);
         if( is_END( filebuffer[i] ) ){
             

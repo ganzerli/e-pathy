@@ -79,7 +79,20 @@ u32 del(u32 index){
 u32 path(u32 selected_node){
 // PRINTING    
     u32 node_begin = 0;
+    // having a selected node in filebuffer[node] , get filebuffer[begin]
     node_begin = get_node_begin(file_buffer , selected_node);                                // what filebuffer[begin] ->* points to 
+    // from a filebuffer[begin] fill path buffer with nodes or data in it
     u32 count = get_path(file_buffer, path_buffer , node_begin );                            // print path from that --> *[begin]
     return count;
+}
+
+
+// first better using something getting names
+void getToPath(u32*path , u32 count){
+    u32 begin = 0;
+    for(u32 i = 0; i < count; i++){
+        begin = file_buffer[path[i]];
+        begin = get_node_begin(file_buffer, begin);
+        // print path buffers
+    }
 }

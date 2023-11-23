@@ -32,20 +32,24 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
     }
 
     // FILLING ARRAY WHAT_DWITH DATA 
+    // last as end skeleton
+    data_what[WHAT_COUNT] = END_SKELETON; 
     for(u32 i = 0; i < WHAT_COUNT; i++){
-        data_what[i] = query[DATA_BEGIN + WHERE + i];
+        data_what[i] = query[DATA_BEGIN + WHERE_COUNT + i];
         printf("\ndata_what[%u] %0x", i ,data_what[i]);
     }
+    printf("\ndata_what[last] %0x",data_what[WHAT_COUNT]);
 
     printf("\nINSTRUCTION:%u \nOPTIONS: %u\ncount: %u", INSTRUCTION,OPTIONS,PACKAGE_COUNT );
     
     switch(INSTRUCTION){
         
         case 0:// 0 = ADD NODE
+            // path will be always 0 for now , root
 
-            // just adding to root
-            // add_to_path(WHERE , NODE_SKELETON);
-            // init_node(WHERE, &data[WHERE] );
+            add_to_path(0 , NODE_SKELETON);
+            // init first NODE_SKELETON found at path filebuffer[0]
+            init_node(0, data_what );
            
         break;
         
@@ -56,9 +60,10 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
 
         
         case 2:// 2 = GET PATH
-            response_size = path(WHERE) * sizeof(u32);
-            buffer = (char*)path_buffer;
-            printf("response size:%u", response_size);
+            // GETTING TO PATH FIRST..s
+            // response_size = path(WHERE) * sizeof(u32);
+            // buffer = (char*)path_buffer;
+            // printf("response size:%u", response_size);
         break;
 
         
