@@ -35,33 +35,17 @@ u32 add_to_path(u32 path_begin , u32 data){
     save(FILENAME , file_buffer , int32count);
 }
 
-// // INIT first uninitialized node [NODE_SKELETON] found in path from [begin*] and add array of new data or nodes
-
-// // SOME INPUT
-//     u32 new_data_or_nodes[5];
-//     new_data_or_nodes[0] = NODE_SKELETON;
-//     new_data_or_nodes[1] = 1;
-//     new_data_or_nodes[2] = 2;
-//     new_data_or_nodes[3] = 3;
-//     new_data_or_nodes[4] = END_SKELETON;
-// //  END SOME INPUT
-
-// having an unitialized node -NODE_SKELETON- in a path , 
-// walk throught the path, find that kind of node, search memory, assing the location in that node
-// and write the location of the first element in found NODE_SKELETON
-// COUNT is NOT NEEDED, but NEEDED IS END_SKELETON at LAST INDEX of dataArray
+// search 1 NODE_SKELETON (uninitialized node)
+// give a location and write array of data (or nodes) in
+// END_SKELETON NEEDED at LAST INDEX of dataArray
 u32 init_node( u32 branchBegin , u32* dataArray ){
     n_breaks = find_ENDs( file_buffer , ends_buffer , branchBegin );                      // needed to know when to jump where
     init_node_in_path( file_buffer, branchBegin, ends_buffer, n_breaks, dataArray );
+    // save in file back (in need of speed is also... but is good)
     save(FILENAME , file_buffer , int32count);
 }
 
-// if( 0 ){
-//     n_breaks = find_ENDs( file_buffer , ends_buffer , begin );                      // needed to know when to jump where
-//     init_node_in_path( file_buffer, begin, ends_buffer, n_breaks, new_data_or_nodes );
-//     save(FILENAME , file_buffer , int32count);
-// }
-
+// index of file buffers
 u32 del(u32 index){
     u32 todelete = index;
     u32 deleted = file_buffer[index];
@@ -76,14 +60,19 @@ u32 del(u32 index){
 // lodaing path in path buffer
 // having 0 prints the root branch
 // example: running path() again for every data found (hope is all nodes) will be displayed the first layer of the graph
-u32 path(u32 selected_node){
-// PRINTING    
-    u32 node_begin = 0;
-    // having a selected node in filebuffer[node] , get filebuffer[begin]
-    node_begin = get_node_begin(file_buffer , selected_node);                                // what filebuffer[begin] ->* points to 
+u32 raw_path_from(u32 selected_node){
     // from a filebuffer[begin] fill path buffer with nodes or data in it
-    u32 count = get_path(file_buffer, path_buffer , node_begin );                            // print path from that --> *[begin]
+    u32 count = get_path(file_buffer, path_buffer , selected_node );                            // print path from that --> *[begin]
     return count;
+}
+
+
+
+
+// having raw node NODE_SKELETON + pathid, get in path-begin/node-begin, and read data there
+u32 first_data_in_node(u32 node){
+    u32 node_begin = get_node_begin(file_buffer, node);
+    return trim_first_2_bits(file_buffer[node_begin]);
 }
 
 

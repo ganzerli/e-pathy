@@ -5,6 +5,12 @@
 2 = GET PATH
 
 */
+void format_response(char*bf_out, u32* bf_in , u32 count){
+    char* res_b_in = (char*)bf_in;
+    for(u32 i = 0; i < count;i++){
+        bf_out[i] = res_b_in[i];
+    }
+}
 
 // getting instruction from relacy, execute it and send result
 unsigned int execute_instruction(char* buffer , unsigned int size){
@@ -41,6 +47,8 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
     printf("\ndata_what[last] %0x",data_what[WHAT_COUNT]);
 
     printf("\nINSTRUCTION:%u \nOPTIONS: %u\ncount: %u", INSTRUCTION,OPTIONS,PACKAGE_COUNT );
+
+
     
     switch(INSTRUCTION){
         
@@ -50,6 +58,8 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
             add_to_path(0 , NODE_SKELETON);
             // init first NODE_SKELETON found at path filebuffer[0]
             init_node(0, data_what );
+            response_size = raw_path_from(0) * sizeof(u32);
+            format_response(buffer , path_buffer , response_size);
            
         break;
         
@@ -60,8 +70,11 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
 
         
         case 2:// 2 = GET PATH
-            // GETTING TO PATH FIRST..s
-            // response_size = path(WHERE) * sizeof(u32);
+            // find path names
+            response_size = raw_path_from(0) * sizeof(u32);
+            format_response(buffer , path_buffer , response_size);
+
+            // response_size = path(0) * sizeof(u32);
             // buffer = (char*)path_buffer;
             // printf("response size:%u", response_size);
         break;
@@ -76,7 +89,6 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         buffer[2] = 'R';
         buffer[3] = 'O';
         buffer[4] = 'R';
-
         response_size = 5;
     }
 
