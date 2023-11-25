@@ -71,7 +71,7 @@ u32 raw_path_from(u32 selected_node){
 // A B S T R A C T I O N  ABSTRACTION  A B S T R A C T I O N  ABSTRACTION
 
 // replaces raw_nodes with first data found in each one
-void first_in_nodes(u32 count){
+void firsts_in_node(u32 count){
     u32 to_index = 0;
     for(u32 i = 0; i< count;i++){
         // in this architecture every first data in a path rapresents a "name"
@@ -83,6 +83,33 @@ void first_in_nodes(u32 count){
         to_index = trim_first_2_bits (path_buffer[i]);
         path_buffer[i] = trim_first_2_bits(file_buffer[to_index]); 
     }
+}
+
+// where is the id of a name in that path
+// root/abc/ -> id of abc
+//                             _-> first data in a path , in this use of e-pathy
+u32 name_in_id(u32 fromid, u32 name){
+    u32 to_index = 0;
+    // load row nodes in path_buffer
+    u32 count = raw_path_from(fromid);
+    // check if nama exists
+    for(u32 i = 0; i < count; i++){
+        // look in the node the node
+        if( !is_NODE(path_buffer[i]) ){
+            printf("\ndata in raw_node[%u] is not a node, is: %u" , i, path_buffer[i] );
+            path_buffer[i] = 0;
+            continue;
+        }
+
+        to_index = trim_first_2_bits (path_buffer[i]);
+        if ( name == trim_first_2_bits(file_buffer[to_index]) ) {
+            printf("node named: %u, is in filebuffer[%u]", name , to_index );
+            return to_index;
+        }
+
+    }
+    printf("node named: %u, not found in path filebuffer[%u]", name , fromid ); 
+    return to_index;
 }
 
 // first better using something getting names
