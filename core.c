@@ -123,14 +123,14 @@ u32 find_ENDs( u32* filebuffer , u32* ENDsbuffer , u32 path_begin ){
             if(END_points_to == END_SKELETON){
                // end = path_begin + i;
                 ENDsbuffer[ends-1] = i;
-                printf("ends buffer[%u] = %u\n",ends - 1, ENDsbuffer[ends]);
+                printf("ends buffer[%u] = %u\n",ends - 1, ENDsbuffer[ends-1]);
                 exit = 1;
                 break;
             }else{
                 end = i;
                 i = END_points_to;                                                  // set position of i at p* of [END p*]    
-                ENDsbuffer[ends] = end;                                             // save [END] in ENDsbuffer[last]
-                printf("ends buffer[%u] = %u\n",ends, ENDsbuffer[ends]);
+                ENDsbuffer[ends-1] = end;                                             // save [END] in ENDsbuffer[last]
+                printf("ends buffer[%u] = %u\n",ends-1, ENDsbuffer[ends-1]);
                 ends++;                                                             // point to next index in ENDsbuffer[next last]
                 printf("[%u] -> %u \n",i, filebuffer[i]);
             }
@@ -232,16 +232,16 @@ u32 init_node_in_path(u32* filebuffer, u32 path_begin,  u32 *ENDs, u32 ends, u32
         printf("filebuffer[%u] = %u\n", i , filebuffer[i]);
 
         if (filebuffer[i] == NODE_SKELETON){                                        // uninitialized node found
-            printf("filebuffer[%u] = %u  == %u\n" , i, filebuffer[i] , NODE_SKELETON);
+            printf("filebuffer[%u] = %u  == NODE_SKELETON\n" , i, filebuffer[i] , NODE_SKELETON);
             found_and_initialized = i;                                              // save the index
             i = SOMETHING_WENT_WRONG;                                               // exit loop
             break;
         }
         if(i == ENDs[branch_break] ){                                               // position is on a break [END p*]
-            printf("filebuffer[%u] ,  Ends[branch_break] == %u \n" , i , ENDs[branch_break]  );
+            printf("filebuffer[%u] is END pointing to->%u  Ends[%u] == %u \n" , i ,file_buffer[i], branch_break, file_buffer[i]);
             //data_variable = trim_first_2_bits(filebuffer[i]);                     // END TYPE IS ALREADY [00]..101010...
             branch_break ++;                                                        // set break to next of ENDs buffer
-            i = filebuffer[i];                                 
+            i = filebuffer[i];                                                      // trim first 2 bits not needed only in this case, end begins/type is 00                        
         }else{                                                                      // if not a bresk [END p*]
             i++;                                                                    // continue               
         } 
@@ -249,7 +249,7 @@ u32 init_node_in_path(u32* filebuffer, u32 path_begin,  u32 *ENDs, u32 ends, u32
     // RETURN IF NOTHING FOUND
     if(found_and_initialized == SOMETHING_WENT_WRONG){
         printf("\nNOT ANY uninitialized node found: NODE_SKELETON in path: /%u not foud, you need to add_node_or_data_to -> %u ", path_begin , path_begin);
-        return filebuffer_count;
+        return 0;
     }
 
     // UNINITIALIZED NODE [NODE_SKELETON] WAS FOUND
@@ -294,7 +294,7 @@ u32 get_node_begin( u32* filebuffer, u32 node){
 }
 
 ////////////////////////////////////////////////////////////////////////////////        GET PATH FROM BEGIN       ////
-u32 get_path( u32* filebuffer, u32* path_buffer, u32 node_begin){
+u32 get_path( u32* filebuffer, u32* path_buffer, u32 node_begin ){
 
     printf("\n\n     Get path\n\n");
     printf("node begin : %u  , filebuffer[node_begin] = %u\n", node_begin, filebuffer[node_begin]);

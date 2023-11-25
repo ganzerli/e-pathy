@@ -62,26 +62,6 @@ int main() {
    //  get parse execute commands, send data
    //  ...
 
-    u32 buffer_[256];
-
-
-    // get every first element, in every node present in that path
-
-    // void get_first(u32 count, u32 * buffer_){
-    //     u32 j = 0;
-    //     u32 node = 0;
-    //     for(u32 i = 0; i < count; i++){
-    //         if (path_buffer[i] != NODE_SKELETON){
-    //             node = trim_first_2_bits(path_buffer[i])
-    //             node = get_node_begin(file_buffer, node);
-    //             printf("first:->%u", node);
-    //             buffer_[j] = node;
-    //             j++;
-    //         }
-    //     }
-    //     return j;
-    // }
-
     // port and queue
     epathy_listen("8680",1);
     free(file_buffer);

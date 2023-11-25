@@ -66,15 +66,24 @@ u32 raw_path_from(u32 selected_node){
     return count;
 }
 
+// A B S T R A C T I O N  ABSTRACTION  A B S T R A C T I O N  ABSTRACTION
+// ABSTRACTION  A B S T R A C T I O N  ABSTRACTION  A B S T R A C T I O N
+// A B S T R A C T I O N  ABSTRACTION  A B S T R A C T I O N  ABSTRACTION
 
-
-
-// having raw node NODE_SKELETON + pathid, get in path-begin/node-begin, and read data there
-u32 first_data_in_node(u32 node){
-    u32 node_begin = get_node_begin(file_buffer, node);
-    return trim_first_2_bits(file_buffer[node_begin]);
+// replaces raw_nodes with first data found in each one
+void first_in_nodes(u32 count){
+    u32 to_index = 0;
+    for(u32 i = 0; i< count;i++){
+        // in this architecture every first data in a path rapresents a "name"
+        if( !is_NODE(path_buffer[i]) ){
+            printf("\ndata in raw_node[%u] is not a node, is: %u" , i, path_buffer[i] );
+            path_buffer[i] = 0;
+            continue;
+        }
+        to_index = trim_first_2_bits (path_buffer[i]);
+        path_buffer[i] = trim_first_2_bits(file_buffer[to_index]); 
+    }
 }
-
 
 // first better using something getting names
 void getToPath(u32*path , u32 count){

@@ -55,7 +55,7 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         case 0:// 0 = ADD NODE
             // path will be always 0 for now , root
 
-            add_to_path(0 , NODE_SKELETON);
+            //add_to_path(0 , NODE_SKELETON);
             // init first NODE_SKELETON found at path filebuffer[0]
             init_node(0, data_what );
             response_size = raw_path_from(0) * sizeof(u32);
@@ -71,7 +71,9 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         
         case 2:// 2 = GET PATH
             // find path names
-            response_size = raw_path_from(0) * sizeof(u32);
+            size = raw_path_from(0);
+            first_in_nodes(size);
+            response_size = size * sizeof(u32);
             format_response(buffer , path_buffer , response_size);
 
             // response_size = path(0) * sizeof(u32);
