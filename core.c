@@ -15,6 +15,7 @@ unsigned int is_DATA(u32 num){
 }
 
 ////////////////////////////////////////////////////////////////////////////////        TRIM FIRST 2 BITS       ////
+// pointers for arrays , graph to graph
 u32 trim_first_2_bits(u32 data){
     u32 trimmed = 0;
     //         00111111111111111111111111111111
@@ -297,7 +298,7 @@ u32 get_node_begin( u32* filebuffer, u32 node){
 u32 get_path( u32* filebuffer, u32* path_buffer, u32 node_begin ){
 
     printf("\n\n     Get path\n\n");
-    printf("node begin : %u  , filebuffer[node_begin] = %u\n", node_begin, filebuffer[node_begin]);
+    printf("node begin : %u  , filebuffer[%u] = %0x\n", node_begin, node_begin, filebuffer[node_begin]);
 
     u32 i = node_begin;
     u32 count = 0;

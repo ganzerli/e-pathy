@@ -40,21 +40,26 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
     // FILLING ARRAY WHAT_DWITH DATA 
     // last as end skeleton
     data_what[WHAT_COUNT] = END_SKELETON; 
+    u32 pure_to_format = 0;
     for(u32 i = 0; i < WHAT_COUNT; i++){
-        data_what[i] = query[DATA_BEGIN + WHERE_COUNT + i];
+        pure_to_format = query[DATA_BEGIN + WHERE_COUNT + i];
+        // just for security reasons..
+        pure_to_format = trim_first_2_bits(pure_to_format);
+        pure_to_format += DATA_SKELETON;
+        
+        data_what[i] = pure_to_format;
+        
         printf("\ndata_what[%u] %0x", i ,data_what[i]);
     }
     printf("\ndata_what[last] %0x",data_what[WHAT_COUNT]);
 
     printf("\nINSTRUCTION:%u \nOPTIONS: %u\ncount: %u", INSTRUCTION,OPTIONS,PACKAGE_COUNT );
 
-
     
     switch(INSTRUCTION){
         
         case 0:// 0 = ADD NODE
             // path will be always 0 for now , root
-
             add_to_path(9 , NODE_SKELETON);
             // init first NODE_SKELETON found at path filebuffer[0]
             init_node(9, data_what );
@@ -82,8 +87,8 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         
         case 2:// 2 = GET PATH
             // find path names
-            size = raw_path_from(0);
-            firsts_in_node(size);
+            size = raw_path_from(9);
+            firsts_in_path(size);
             response_size = size * sizeof(u32);
             format_response(buffer , path_buffer , response_size);
 
@@ -94,6 +99,10 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
 
         
         case 3:// 3 = DELETE
+        // get to a pathſ
+        response_size = PACKAGE_COUNT * sizeof(u32);
+        u32 path[2] = { 0x1234 , 0x3214};
+        follow_path(path , 2);
         break;
 
         default:
