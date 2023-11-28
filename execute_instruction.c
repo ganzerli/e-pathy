@@ -38,7 +38,7 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
     }
 
     // FILLING ARRAY WHAT_DWITH DATA 
-    // last as end skeleton
+    // last as END_SKELETON
     data_what[WHAT_COUNT] = END_SKELETON; 
     u32 pure_to_format = 0;
     for(u32 i = 0; i < WHAT_COUNT; i++){
@@ -55,42 +55,69 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
 
     printf("\nINSTRUCTION:%u \nOPTIONS: %u\ncount: %u", INSTRUCTION,OPTIONS,PACKAGE_COUNT );
 
-    
+    u32 count = 0;
+    //  path_begin = index in filebuffer[ ]
+    u32 path_begin = 0;                             
     switch(INSTRUCTION){
-        
-        case 0:// 0 = ADD NODE
-            // path will be always 0 for now , root
-            add_to_path(9 , NODE_SKELETON);
-            // init first NODE_SKELETON found at path filebuffer[0]
-            init_node(9, data_what );
-            response_size = raw_path_from(0) * sizeof(u32);
+
+        case 0: // display root
+            u32 const ROOT = 0;
+            // display
+            count = raw_path_from(ROOT);
+            firsts_in_path(count);
+            // RESPONSE
+            response_size = count * sizeof(u32);
             format_response(buffer , path_buffer , response_size);
+        
+        case 1:// 0 = ADD NODE
+            // if path is 0 ROOT no need to search path and return 0 if not found
+            if(data_where[0] == 0){
+                add_to_path(0 , NODE_SKELETON);
+                init_node(0, data_what );
+                // RESPONSE
+                response_size = raw_path_from(0) * sizeof(u32);
+                format_response(buffer , path_buffer , response_size);
+                break;
+            }// 1234 2222
+            // if path is not ROOT
+
+            // dev..
+            // u32 path_begin = 0;//follow_path( data_where , WHERE_COUNT);
+            // count = raw_path_from(0);
+            // firsts_in_path(count);
+            // printf("path begin:  %u" , path_begin );
+            // // RESPONSE
+            // response_size = count * sizeof(u32);
+            // format_response(buffer , path_buffer , response_size);
            
         break;
         
        
-        case 1: // 1 = ADD TO PATH
-
-            // get to node
-            u32 name = name_in_id(0, 0x1234);
-            u32 erro[1] = {0x000E4404};
-            if(!name){
-                response_size = 4;
-                format_response(buffer, erro , 4 );
-            }
-            response_size = 4;
-            u32 res[1] = {name};
-            format_response(buffer, res, 4);
+        case 2: // 2 = SOMETHING
 
         break;
 
         
-        case 2:// 2 = GET PATH
-            // find path names
-            size = raw_path_from(9);
-            firsts_in_path(size);
-            response_size = size * sizeof(u32);
-            format_response(buffer , path_buffer , response_size);
+        case 3:// 3 = DISPLAY PATH
+            // until now in where the fist has to be always 0 ROOT
+            count = WHERE_COUNT - 1;
+            // find index in filebuffer
+            path_begin = follow_path(&data_where[1],count);                 // data_where 0 is always set to 0 from relacy
+            printf("\npath_begin found: %u", path_begin);
+
+            // check name of nodes in path_begin
+            count = raw_path_from(path_begin);
+            path_begin = firsts_in_path(count);
+            if(!path_begin){
+                printf(" - > not any node in this path");
+                char path_empty[] = "No nodes in this path";
+                response_size = sizeof(path_empty);
+                format_response(buffer , path_empty , response_size);
+            }else{
+                response_size = count * sizeof(u32);
+                format_response(buffer , path_buffer , response_size);
+            }
+
 
             // response_size = path(0) * sizeof(u32);
             // buffer = (char*)path_buffer;
@@ -98,11 +125,13 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         break;
 
         
-        case 3:// 3 = DELETE
+        case 4:// 3 = DELETE
         // get to a pathſ
         response_size = PACKAGE_COUNT * sizeof(u32);
         u32 path[2] = { 0x1234 , 0x3214};
+
         follow_path(path , 2);
+
         break;
 
         default:

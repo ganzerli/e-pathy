@@ -71,18 +71,19 @@ u32 raw_path_from(u32 selected_node){
 // A B S T R A C T I O N  ABSTRACTION  A B S T R A C T I O N  ABSTRACTION
 
 // replaces raw_nodes in path_buffer with first data found in each one
-void firsts_in_path(u32 count){
+u32 firsts_in_path(u32 count){
     u32 to_index = 0;
     for(u32 i = 0; i< count;i++){
         // in this architecture every first data in a path rapresents a "name"
         if( !is_NODE(path_buffer[i]) ){
-            printf("\ndata in raw_node[%u] is not a node, is: %u" , i, path_buffer[i] );
+            printf("\ndata in path_buffer[%u] is not a node, is: %u" , i, path_buffer[i] );
             path_buffer[i] = 0;
             continue;
         }
         to_index = trim_first_2_bits (path_buffer[i]);
         path_buffer[i] = trim_first_2_bits(file_buffer[to_index]); 
     }
+    return to_index;
 }
 
 // where is the id of a name in that path
