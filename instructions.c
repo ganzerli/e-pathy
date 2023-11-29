@@ -122,7 +122,7 @@ u32 follow_path(u32*path , u32 count){
     node_index = name_in_id(ROOT, path[0]);
     printf("\nname: %0x existing in ROOT , in filebuffer[%u]", path[0], node_index );
     // check all other nodes
-    for(u32 i = 0; i < count; i++){
+    for(u32 i = 1; i < count; i++){
         if(node_index)node_index = name_in_id(node_index, path[i]);
         printf("\nname: %0x existing in %0x , in filebuffer[%u]", path[i] , path[i-1] , node_index );
     }

@@ -25,11 +25,14 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
     const u32 WHERE_COUNT = query[1];                     // COUNT OF NODES TO REACH PATH
     const u32 WHAT_COUNT = query[2];                      // COUNT OF ELEMENTS TO ADD
     const u32 OPTIONS = query[3];
-    const u32 PACKAGE_COUNT= query[4];
+    const u32 PACKAGE_COUNT = query[4];
     // .. data[][][][][][]...
     
     const u32 DATA_BEGIN = 5;
     u32 data_where[WHERE_COUNT] ,data_what[WHAT_COUNT+1];
+    // DATA WHERE O IS ALWAYS ROOT
+    // ADDING A 0 TO data_where[1] fo further checks
+
 
     // FILLING ARRAY FOR PATH WHERE_COUNT
     for(u32 i = 0; i < WHERE_COUNT; i++){
@@ -45,7 +48,10 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         pure_to_format = query[DATA_BEGIN + WHERE_COUNT + i];
         // just for security reasons..
         pure_to_format = trim_first_2_bits(pure_to_format);
+
+        ////////////////////////////////////
         pure_to_format += DATA_SKELETON;
+        ////////////////////////////////////
         
         data_what[i] = pure_to_format;
         
@@ -57,11 +63,12 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
 
     u32 count = 0;
     //  path_begin = index in filebuffer[ ]
-    u32 path_begin = 0;                             
+    u32 path_begin = 0;    
+    u32 const ROOT = 0;                         
     switch(INSTRUCTION){
 
         case 0: // display root
-            u32 const ROOT = 0;
+           
             // display
             count = raw_path_from(ROOT);
             firsts_in_path(count);
@@ -72,25 +79,25 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         case 1:// 0 = ADD NODE
             // if path is 0 ROOT no need to search path and return 0 if not found
             if(data_where[0] == 0){
-                add_to_path(0 , NODE_SKELETON);
-                init_node(0, data_what );
+                add_to_path(ROOT , NODE_SKELETON);
+                init_node(ROOT, data_what );
                 // RESPONSE
-                response_size = raw_path_from(0) * sizeof(u32);
+                response_size = raw_path_from(ROOT) * sizeof(u32);
                 format_response(buffer , path_buffer , response_size);
                 break;
             }// 1234 2222
             // if path is not ROOT
 
-            // dev..
-            // u32 path_begin = 0;//follow_path( data_where , WHERE_COUNT);
-            // count = raw_path_from(0);
-            // firsts_in_path(count);
-            // printf("path begin:  %u" , path_begin );
-            // // RESPONSE
-            // response_size = count * sizeof(u32);
-            // format_response(buffer , path_buffer , response_size);
+            //                    first in data_where is always 0 until now
+            u32 path_begin = follow_path( data_where , WHERE_COUNT);
+            add_to_path(path_begin , NODE_SKELETON);
+            init_node(path_begin, data_what );
+            count = raw_path_from(path_begin);
+            // RESPONSE
+            response_size = count * sizeof(u32);
+            format_response(buffer , path_buffer , response_size);
            
-        break;
+            break;
         
        
         case 2: // 2 = SOMETHING
@@ -99,10 +106,9 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
 
         
         case 3:// 3 = DISPLAY PATH
-            // until now in where the fist has to be always 0 ROOT
-            count = WHERE_COUNT - 1;
+
             // find index in filebuffer
-            path_begin = follow_path(&data_where[1],count);                 // data_where 0 is always set to 0 from relacy
+            path_begin = follow_path(data_where,WHERE_COUNT);                 // data_where 0 is always set to 0 from relacy
             printf("\npath_begin found: %u", path_begin);
 
             // check name of nodes in path_begin
@@ -111,8 +117,9 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
             if(!path_begin){
                 printf(" - > not any node in this path");
                 char path_empty[] = "No nodes in this path";
+                u32 * frm_path_empty = (u32*) path_empty;
                 response_size = sizeof(path_empty);
-                format_response(buffer , path_empty , response_size);
+                format_response(buffer , frm_path_empty , response_size);
             }else{
                 response_size = count * sizeof(u32);
                 format_response(buffer , path_buffer , response_size);
