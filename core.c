@@ -23,6 +23,13 @@ u32 trim_first_2_bits(u32 data){
     trimmed = data & mask;
     return trimmed;
 }
+////////////////////////////////////////////////////////////////////////////////        FORMAT DATA
+int epathy_format(u32* data, u32 type){
+    if(*data > 0x3FFFFFFF) return 0;
+    // type referred as NODE_ or as DATA_ 
+    *data += type;
+    return 1;
+}
 
 ////////////////////////////////////////////////////////////////////////////////        REQUIRE MEMORY       ////
 u32 require_memory(u32 amount, u32 limit){

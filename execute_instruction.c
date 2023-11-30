@@ -1,11 +1,14 @@
-/*      INSTRUCTION SET E-PATHY
+//      INSTRUCTION SET E-PATHY
 
-0 = NEW NODE
-1 = ADD TO PATH
-2 = GET PATH
+#define DISPLAY_ROOT 0
+#define ADD_NODE 1
+#define ADD_TO_EXISTING_PATH 2
+#define DIAPLAY_PATH 3
+#define DELETE 4
+#define ROOT 0
 
-*/
-void format_response(char*bf_out, u32* bf_in , u32 count){
+
+void format_response(char*bf_out, void* bf_in , u32 count){
     char* res_b_in = (char*)bf_in;
     for(u32 i = 0; i < count;i++){
         bf_out[i] = res_b_in[i];
@@ -39,56 +42,50 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         data_where[i] = query[DATA_BEGIN+i];
         printf("\ndata_where[%u] %0x", i ,data_where[i]);
     }
-
     // FILLING ARRAY WHAT_DWITH DATA 
     // last as END_SKELETON
     data_what[WHAT_COUNT] = END_SKELETON; 
     u32 pure_to_format = 0;
     for(u32 i = 0; i < WHAT_COUNT; i++){
-        pure_to_format = query[DATA_BEGIN + WHERE_COUNT + i];
-        // just for security reasons..
-        pure_to_format = trim_first_2_bits(pure_to_format);
-
-        ////////////////////////////////////
-        pure_to_format += DATA_SKELETON;
-        ////////////////////////////////////
-        
-        data_what[i] = pure_to_format;
-        
+        data_what[i] = query[DATA_BEGIN + WHERE_COUNT + i]; 
         printf("\ndata_what[%u] %0x", i ,data_what[i]);
     }
     printf("\ndata_what[last] %0x",data_what[WHAT_COUNT]);
-
     printf("\nINSTRUCTION:%u \nOPTIONS: %u\ncount: %u", INSTRUCTION,OPTIONS,PACKAGE_COUNT );
 
     u32 count = 0;
     //  path_begin = index in filebuffer[ ]
     u32 path_begin = 0;    
-    u32 const ROOT = 0;                         
+
     switch(INSTRUCTION){
 
-        case 0: // display root
-           
-            // display
+        case DISPLAY_ROOT: 
             count = raw_path_from(ROOT);
             firsts_in_path(count);
             // RESPONSE
             response_size = count * sizeof(u32);
             format_response(buffer , path_buffer , response_size);
-        
-        case 1:// 0 = ADD NODE
-            // if path is 0 ROOT no need to search path and return 0 if not found
-            if(data_where[0] == 0){
-                add_to_path(ROOT , NODE_SKELETON);
-                init_node(ROOT, data_what );
+            break;
+        case ADD_NODE:
+            // adding node is expected only one value in data_what
+            // the only value in data_what should be a -DATA- , <--> NOT a NODE
+            if(!epathy_format(&data_what[0], DATA_SKELETON)){
+            //  F O R M A T    E R R O R
+                printf("BAD FORMAT: formatting data");
+                char BAD_FORMAT[] = "BAD FORMAT: formatting data";
+                response_size = sizeof(BAD_FORMAT);
+                format_response(buffer , BAD_FORMAT , response_size);
+                break;
+            }
+            if(data_where[0] == ROOT){
+                add_to_path(ROOT , NODE_SKELETON);                          // add empty node
+                init_node(ROOT, data_what );                                // initializing new empty node
                 // RESPONSE
                 response_size = raw_path_from(ROOT) * sizeof(u32);
                 format_response(buffer , path_buffer , response_size);
                 break;
-            }// 1234 2222
-            // if path is not ROOT
-
-            //                    first in data_where is always 0 until now
+            }
+            // data_where = PATH from ROOT + 1 layer, ROOT MUST NOT be INCLUDED
             u32 path_begin = follow_path( data_where , WHERE_COUNT);
             add_to_path(path_begin , NODE_SKELETON);
             init_node(path_begin, data_what );
@@ -96,18 +93,16 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
             // RESPONSE
             response_size = count * sizeof(u32);
             format_response(buffer , path_buffer , response_size);
-           
             break;
         
-       
-        case 2: // 2 = SOMETHING
+        case ADD_TO_EXISTING_PATH: 
+        // if node or data
+        // 
 
         break;
-
         
-        case 3:// 3 = DISPLAY PATH
-
-            // find index in filebuffer
+        case DIAPLAY_PATH:
+            // data_where = PATH from ROOT, ROOT MUST NOT be INCLUDED
             path_begin = follow_path(data_where,WHERE_COUNT);                 // data_where 0 is always set to 0 from relacy
             printf("\npath_begin found: %u", path_begin);
 
@@ -117,37 +112,24 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
             if(!path_begin){
                 printf(" - > not any node in this path");
                 char path_empty[] = "No nodes in this path";
-                u32 * frm_path_empty = (u32*) path_empty;
                 response_size = sizeof(path_empty);
-                format_response(buffer , frm_path_empty , response_size);
+                format_response(buffer , path_empty , response_size);
             }else{
                 response_size = count * sizeof(u32);
                 format_response(buffer , path_buffer , response_size);
             }
-
-
-            // response_size = path(0) * sizeof(u32);
-            // buffer = (char*)path_buffer;
-            // printf("response size:%u", response_size);
         break;
 
         
-        case 4:// 3 = DELETE
-        // get to a pathſ
-        response_size = PACKAGE_COUNT * sizeof(u32);
-        u32 path[2] = { 0x1234 , 0x3214};
-
-        follow_path(path , 2);
-
+        case DELETE:
         break;
 
         default:
-        buffer[0] = 'E';
-        buffer[1] = 'R';
-        buffer[2] = 'R';
-        buffer[3] = 'O';
-        buffer[4] = 'R';
-        response_size = 5;
+            printf("\nREQUEST ERROR: OPTION %u NOT AVAILABLE" , INSTRUCTION);
+            char OPT_NOT_EXISTING[] = "nREQUEST ERROR: OPTION NOT AVAILABLE";
+            response_size = sizeof(OPT_NOT_EXISTING);
+            format_response(buffer , OPT_NOT_EXISTING , response_size);
+        break;
     }
 
     return response_size;
