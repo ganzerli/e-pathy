@@ -61,7 +61,7 @@ int main() {
 
     //  get parse execute commands, send data
     //  ...
-
+    printf("\nepathy - listen..");
     // port and queue
     epathy_listen("8680",1);
     free(file_buffer);

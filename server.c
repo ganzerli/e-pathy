@@ -96,7 +96,7 @@ int epathy_listen( char* port , unsigned int queue ){
     // execute instructions
     unsigned int size;
     int result;
-    char buffer[1024*1024];
+    char buffer[1024];
 
     while (1){                                                                      // accepting, waiting connections
         sin_size = sizeof foreign_addr;
@@ -112,9 +112,8 @@ int epathy_listen( char* port , unsigned int queue ){
                 );
 
         // manage request
-        result = recv(new_fd, buffer, (1024*1024), 0);
-        
-        if(result != -1)size = execute_instruction(buffer,(unsigned int) result);
+        result = recv(new_fd, buffer, (1024), 0);
+        if(result != -1) size = execute_instruction(buffer,(unsigned int) result);  // EXECUTE INSTRUCTION
         
         if (!fork()) {                                                              // this is the child process
             close(sockfd);                                                          // child doesn't need the listener

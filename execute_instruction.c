@@ -103,6 +103,7 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         
         case DIAPLAY_PATH:
             // data_where = PATH from ROOT, ROOT MUST NOT be INCLUDED
+            printf("\n display path..");
             path_begin = follow_path(data_where,WHERE_COUNT);                 // data_where 0 is always set to 0 from relacy
             printf("\npath_begin found: %u", path_begin);
 
