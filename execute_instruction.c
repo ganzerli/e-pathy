@@ -66,6 +66,7 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
             response_size = count * sizeof(u32);
             format_response(buffer , path_buffer , response_size);
             break;
+
         case ADD_NODE:
             // adding node is expected only one value in data_what
             // the only value in data_what should be a -DATA- , <--> NOT a NODE
@@ -87,8 +88,14 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
             }
             // data_where = PATH from ROOT + 1 layer, ROOT MUST NOT be INCLUDED
             u32 path_begin = follow_path( data_where , WHERE_COUNT);
-            add_to_path(path_begin , NODE_SKELETON);
-            init_node(path_begin, data_what );
+            //////////////////////////////////////////////
+            // check how many are together if in the case..
+            /////////////////////////////////////////////
+            // N TIMES
+                add_to_path(path_begin , NODE_SKELETON);
+            // N TIMES
+                init_node(path_begin, data_what );
+
             count = raw_path_from(path_begin);
             // RESPONSE
             response_size = count * sizeof(u32);
@@ -98,7 +105,6 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         case ADD_TO_EXISTING_PATH: 
         // if node or data
         // 
-
         break;
         
         case DIAPLAY_PATH:
