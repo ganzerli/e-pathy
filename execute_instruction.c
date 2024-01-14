@@ -79,8 +79,8 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
                 break;
             }
             if(data_where[0] == ROOT){
-                add_to_path(ROOT , NODE_SKELETON);                          // add empty node
-                init_node(ROOT, data_what );                                // initializing new empty node
+                for(u32 i = 0; i< WHAT_COUNT ; i++) add_to_path(ROOT , NODE_SKELETON);// add empty node
+                for(u32 i = 0; i< WHAT_COUNT ; i++) init_node(ROOT, &data_what[i]);// initializing new empty node                             
                 // RESPONSE
                 response_size = raw_path_from(ROOT) * sizeof(u32);
                 format_response(buffer , path_buffer , response_size);
@@ -88,13 +88,8 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
             }
             // data_where = PATH from ROOT + 1 layer, ROOT MUST NOT be INCLUDED
             u32 path_begin = follow_path( data_where , WHERE_COUNT);
-            //////////////////////////////////////////////
-            // check how many are together if in the case..
-            /////////////////////////////////////////////
-            // N TIMES
-                add_to_path(path_begin , NODE_SKELETON);
-            // N TIMES
-                init_node(path_begin, data_what );
+            for(u32 i = 0; i< WHAT_COUNT ; i++) add_to_path(path_begin , NODE_SKELETON);
+            for(u32 i = 0; i< WHAT_COUNT ; i++) init_node(path_begin, &data_what[i]);
 
             count = raw_path_from(path_begin);
             // RESPONSE
