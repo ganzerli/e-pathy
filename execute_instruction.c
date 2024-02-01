@@ -70,14 +70,19 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         case ADD_NODE:
             // adding node is expected only one value in data_what
             // the only value in data_what should be a -DATA- , <--> NOT a NODE
-            if(!epathy_format(&data_what[0], DATA_SKELETON)){
-            //  F O R M A T    E R R O R
-                printf("BAD FORMAT: formatting data");
-                char BAD_FORMAT[] = "BAD FORMAT: formatting data";
-                response_size = sizeof(BAD_FORMAT);
-                format_response(buffer , BAD_FORMAT , response_size);
-                break;
+
+            for(u32 i = 0; i < WHAT_COUNT; i++){
+                epathy_format(&data_what[i], NODE_SKELETON);
             }
+
+            // if(!epathy_format(&data_what[0], NODE_SKELETON)){
+            // //  F O R M A T    E R R O R
+            //     printf("BAD FORMAT: formatting data");
+            //     char BAD_FORMAT[] = "BAD FORMAT: formatting data";
+            //     response_size = sizeof(BAD_FORMAT);
+            //     format_response(buffer , BAD_FORMAT , response_size);
+            //     break;
+            // }
             if(data_where[0] == ROOT){
                 for(u32 i = 0; i< WHAT_COUNT ; i++) add_to_path(ROOT , NODE_SKELETON);// add empty node
                 for(u32 i = 0; i< WHAT_COUNT ; i++) init_node(ROOT, &data_what[i]);// initializing new empty node                             
