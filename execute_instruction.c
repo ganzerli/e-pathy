@@ -99,6 +99,7 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
             count = raw_path_from(path_begin);
             // RESPONSE
             response_size = count * sizeof(u32);
+            //
             format_response(buffer , path_buffer , response_size);
             break;
         
@@ -108,23 +109,34 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         break;
         
         case DIAPLAY_PATH:
-            // data_where = PATH from ROOT, ROOT MUST NOT be INCLUDED
-            printf("\n display path..");
-            path_begin = follow_path(data_where,WHERE_COUNT);                 // data_where 0 is always set to 0 from relacy
-            printf("\npath_begin found: %u", path_begin);
+            // // data_where = PATH from ROOT, ROOT MUST NOT be INCLUDED
+            // printf("\n display path..");
+            // path_begin = follow_path(data_where,WHERE_COUNT);                 // data_where 0 is always set to 0 from relacy
+            // printf("\npath_begin found: %u", path_begin);
 
-            // check name of nodes in path_begin
-            count = raw_path_from(path_begin);
-            path_begin = firsts_in_path(count);
-            if(!path_begin){
-                printf(" - > not any node in this path");
-                char path_empty[] = "No nodes in this path";
-                response_size = sizeof(path_empty);
-                format_response(buffer , path_empty , response_size);
-            }else{
-                response_size = count * sizeof(u32);
-                format_response(buffer , path_buffer , response_size);
+            // // check name of nodes in path_begin
+            // count = raw_path_from(path_begin);
+            // path_begin = firsts_in_path(count);
+            // if(!path_begin){
+            //     printf(" - > not any node in this path");
+            //     char path_empty[] = "No nodes in this path";
+            //     response_size = sizeof(path_empty);
+            //     format_response(buffer , path_empty , response_size);
+            // }else{
+            //     response_size = count * sizeof(u32);
+            //     format_response(buffer , path_buffer , response_size);
+            // }
+
+            // if display root
+            if(data_where[0] == ROOT){
+                count = raw_path_from(ROOT);
+                firsts_in_path(count);
+                format_response(buffer,path_buffer,count*sizeof(u32));
             }
+
+            //path_begin = follow_path(data_where,WHERE_COUNT);
+
+
         break;
 
         

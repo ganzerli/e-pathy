@@ -82,6 +82,7 @@ u32 firsts_in_path(u32 count){
         }
         to_index = trim_first_2_bits (path_buffer[i]);
         path_buffer[i] = trim_first_2_bits(file_buffer[to_index]); 
+        printf("putting: %u in path_buffer[%u]\n", path_buffer[i] , i);
     }
     return to_index;
 }
