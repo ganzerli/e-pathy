@@ -72,19 +72,21 @@ u32 raw_path_from(u32 selected_node){
 
 // replaces raw_nodes in path_buffer with first data found in each one
 u32 firsts_in_path(u32 count){
-    u32 to_index = 0;
+    u32 raw_data = 0;
+    u32 clean_data = 0;
+    u32 offset = 0;
+    u32 node_name = 0;
+
     for(u32 i = 0; i< count;i++){
         // in this architecture every first data in a path rapresents a "name"
-        if( !is_NODE(path_buffer[i]) ){
-            printf("\ndata in path_buffer[%u] is not a node, is: %u" , i, path_buffer[i] );
-            path_buffer[i] = 0;
-            continue;
-        }
-        to_index = trim_first_2_bits (path_buffer[i]);
-        path_buffer[i] = trim_first_2_bits(file_buffer[to_index]); 
-        printf("putting: %u in path_buffer[%u]\n", path_buffer[i] , i);
+        raw_data = path_buffer[i];                              // for whom is coming from heavy job background, transitioning registers can be seen as fun.
+        clean_data = trim_first_2_bits(raw_data);
+        // get data from pointed location
+        raw_data = file_buffer[clean_data];
+        clean_data = trim_first_2_bits(raw_data);               // get the "name" as was
+        path_buffer[i] = clean_data;                            // replace in path_buffer
     }
-    return to_index;
+    return raw_data;
 }
 
 // where is the id of a name in that path

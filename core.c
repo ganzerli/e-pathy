@@ -271,7 +271,7 @@ u32 init_node_in_path(u32* filebuffer, u32 path_begin,  u32 *ENDs, u32 ends, u32
     while(new_data_nodes[count] != END_SKELETON){
         count ++;
     }
-    // LOOP JUMPS AT END_SKELETON count needs +1
+    // LOOP JUMPS AT END_SKELETON count needs +1 , FOR THE [END_SKELETON]
     count ++;
 
     printf(" %u of memory are required \n", count);
