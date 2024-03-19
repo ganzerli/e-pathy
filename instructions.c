@@ -72,28 +72,33 @@ u32 raw_path_from(u32 selected_node){
 
 // replaces raw_nodes in path_buffer with first data found in each one
 u32 firsts_in_path(u32 count){
+
+    printf("\n FIRSTS IN PATH \n");
     u32 raw_data = 0;
     u32 clean_data = 0;
-    u32 offset = 0;
+    u32 path_buffer_i= 0;
     u32 node_name = 0;
 
     for(u32 i = 0; i< count;i++){
         // in this architecture every first data in a path rapresents a "name"
         raw_data = path_buffer[i];                              // for whom is coming from heavy job background, transitioning registers can be seen as fun.
+        if( ! is_NODE(raw_data)  ) continue;
         clean_data = trim_first_2_bits(raw_data);
         // get data from pointed location
         raw_data = file_buffer[clean_data];
         clean_data = trim_first_2_bits(raw_data);               // get the "name" as was
-        path_buffer[i] = clean_data;                            // replace in path_buffer
+        path_buffer[path_buffer_i] = clean_data;                // replace in path_buffer
+        path_buffer_i++;
+        printf("\npath buffer[%u] = %u", path_buffer_i ,clean_data);
     }
-    return raw_data;
+    return path_buffer_i;
 }
 
 // where is the id of a name in that path
 // root/abc/ -> id of abc
 //                             _-> first data in a path , part of relacy architecture
 u32 name_in_id(u32 fromid, u32 name){
-    printf("\n\n    NODE IN ID \n");
+    printf("\n\n    NAME IN ID \n");
     u32 to_index = 0;
     // load raw nodes in path_buffer
     u32 count = raw_path_from(fromid);
@@ -119,16 +124,18 @@ u32 name_in_id(u32 fromid, u32 name){
 // having path names find node after node to the last
 u32 follow_path(u32*path , u32 count){
     printf("\n\n    FOLLOW PATH \n");
-    const u32 ROOT = 0;
     u32 node_index = 0;
-    // start from root
-    node_index = name_in_id(ROOT, path[0]);
+    // check if nodename in path exists in ROOT
+    node_index = name_in_id( 0 , path[0]);
+    if( node_index == 0 ) return 0;
+
     printf("\nname: %0x existing in ROOT , in filebuffer[%u]", path[0], node_index );
-    // check all other nodes
+
+    // if path count is more than one..   [one] / [thwo] ...
     for(u32 i = 1; i < count; i++){
-        if(node_index)node_index = name_in_id(node_index, path[i]);
+        node_index = name_in_id(node_index, path[i]);
         printf("\nname: %0x existing in %0x , in filebuffer[%u]", path[i] , path[i-1] , node_index );
     }
-    //filebuffer[index]
+    
     return node_index;
 }

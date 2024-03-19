@@ -58,15 +58,7 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
 
     switch(INSTRUCTION){
 
-        case DISPLAY_ROOT: 
-            count = raw_path_from(ROOT);
-            firsts_in_path(count);
-            // RESPONSE
-            response_size = count * sizeof(u32);
-            format_response(buffer , path_buffer , response_size);
-            break;
-
-        case ADD_NODE:
+        case ADD_NODE:// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
             // to initialize a node, in this architecture, [][][*]
             //                                                  |
             //                                                  ---> [DATA-(branch_name)][node][node][node]
@@ -77,90 +69,58 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
             // !! FOLLOW_PATH() DOES START FROM 0 , FOLLOWS FROM THERE, 0 WILL ALWAYS BE, 0 = ROOT
             if(data_where[0] == ROOT){
                 for(u32 i = 0; i< WHAT_COUNT ; i++) add_to_path(ROOT , NODE_SKELETON);// add empty node
-                
                 for(u32 i = 0; i< WHAT_COUNT ; i++) {
                     // needed in this case, is: creatin an array every time, and give it WITH an added END_SKELETON,
                     // in this case , is added just 1 data, to init a brunc, thic can be done more than 1 time, exactly in this case is: WHAT_COUNT times
-                    //
                     // [data or node] [END_SKELETON]-_-'-_~"--> [branch begin n]
                     // [data or node] [END_SKELETON]-_-'-_~"--> [other branch - begin or even not]
-                    //                                    
-                    //
                     u32 new_name_for_new_branch[2] = { data_what[i] , END_SKELETON };
                     init_node(ROOT,new_name_for_new_branch);     // initializing new empty node    
 
                 }     
-
                 // RESPONSE
                 response_size = raw_path_from(ROOT) * sizeof(u32);
                 format_response(buffer , path_buffer , response_size);
                 break;
             }
 
+            //  IF TO ADD NOT IN ROOT , FOLLOW PATH FUNCTION WORKS
+            //  or needed is always to specify the path from root already from the other program sending TCP
+            //  much prettyer for hypster and people with university payed from the parents not adding always root..
+            //  the intellectual guy can tell to girls that he is sending data to : 
+            //  client/items_bought/book_123/page_1/possible_secret_references/client/cart 
+            //  instead of: ROOT/client/items_bought/book_123/page_1/possible_secret_references/client/cart
+            //  exactly.. e-pathy can have loops.. not jet but is easy.. you already know what im thinking.. but, and hippy what can also have???
             u32 path_begin = follow_path( data_where , WHERE_COUNT);
-            for(u32 i = 0; i< WHAT_COUNT ; i++) add_to_path(path_begin , NODE_SKELETON);
-            for(u32 i = 0; i< WHAT_COUNT ; i++) init_node(path_begin, &data_what[i]);
 
-            count = raw_path_from(path_begin);
+            for(u32 i = 0; i< WHAT_COUNT ; i++) add_to_path(path_begin , NODE_SKELETON);
+            // giving a -name- to the new path, and --> ADD end_skeleton <--
+            for(u32 i = 0; i< WHAT_COUNT ; i++) {
+                u32 new_name_for_new_branch[2] = { data_what[i] , END_SKELETON };
+                init_node( path_begin , new_name_for_new_branch );     // initializing new empty node    
+            }  
             // RESPONSE
-            response_size = count * sizeof(u32);
-            //
-            format_response(buffer , path_buffer , response_size);
+            count = raw_path_from(path_begin);
+            format_response(buffer , path_buffer , count * sizeof(u32));
             break;
         
-        case ADD_TO_EXISTING_PATH: 
-        // if node or data
-        // 
-        break;
-        
-        case DIAPLAY_PATH:
-            // // data_where = PATH from ROOT, ROOT MUST NOT be INCLUDED
-            // printf("\n display path..");
-            // path_begin = follow_path(data_where,WHERE_COUNT);                 // data_where 0 is always set to 0 from relacy
-            // printf("\npath_begin found: %u", path_begin);
-
-            // // check name of nodes in path_begin
-            // count = raw_path_from(path_begin);
-            // path_begin = firsts_in_path(count);
-            // if(!path_begin){
-            //     printf(" - > not any node in this path");
-            //     char path_empty[] = "No nodes in this path";
-            //     response_size = sizeof(path_empty);
-            //     format_response(buffer , path_empty , response_size);
-            // }else{
-            //     response_size = count * sizeof(u32);
-            //     format_response(buffer , path_buffer , response_size);
-            // }
-
-            // if display root
+        case DIAPLAY_PATH:// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
             if(data_where[0] == ROOT){
-                // load all [begin][][][] [end] in path_buffer
                 count = raw_path_from(ROOT);
                 // check path_buffer [*][*][*]_find_first_32bit_data->[begin]<-[][][][][end] of every node in this layer
                 firsts_in_path(count);
-                // LOG
-                printf("DISPLAY ROOT\npath buffer");
-                for(u32 i =0 ; i < count ; i++)printf("\npath_buffer[%u] -> %u" , i , path_buffer[i]);
                 // FOMRAT DATA AND RESPONSE
                 response_size = count*sizeof(u32);
                 format_response(buffer,path_buffer,response_size);
                 break;
             }
-            printf("following path");
+
             path_begin = follow_path( data_where , WHERE_COUNT );
             count = raw_path_from(path_begin);
-            firsts_in_path(count);
-
-            //LOG
-            printf("DISPLAY ROOT\npath buffer");
-            for(u32 i =0 ; i < count ; i++)printf("\npath_buffer[%u] -> %u" , i , path_buffer[i]);
-            // FORMAT DATA AND RESPONSE
-            response_size = count*sizeof(u32);
-            format_response(buffer,path_buffer,count*sizeof(u32));
-     
-
-            //path_begin = follow_path(data_where,WHERE_COUNT);
-
+            count = firsts_in_path(count);
+            // response
+            response_size = count*sizeof(u32);                  // needed for network stuff, see return statement
+            format_response(buffer,path_buffer,response_size);
 
         break;
 
@@ -171,8 +131,7 @@ unsigned int execute_instruction(char* buffer , unsigned int size){
         default:
             printf("\nREQUEST ERROR: OPTION %u NOT AVAILABLE" , INSTRUCTION);
             char OPT_NOT_EXISTING[] = "nREQUEST ERROR: OPTION NOT AVAILABLE";
-            response_size = sizeof(OPT_NOT_EXISTING);
-            format_response(buffer , OPT_NOT_EXISTING , response_size);
+            format_response(buffer , OPT_NOT_EXISTING , sizeof(OPT_NOT_EXISTING));
         break;
     }
 
