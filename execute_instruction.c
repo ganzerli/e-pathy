@@ -124,6 +124,80 @@ unsigned int execute_instruction( char* buffer , unsigned int size ){
         
         case DELETE:
             // it will
+            // until now is only possible to delete only one -data-
+            // it can become brutal to delete a branch, because can contain other branches, and this is e-pathy...
+            
+            // neded a bit of pseudo code
+            
+            /*
+            get the branch
+            path_begin = follow_path(data_where , WHERE_COUNT);
+            count = raw_path_from( path_begin );
+            
+            now path_buffer has all the nodes in the path
+            [][][]...
+            
+            can be copied to have it doing the next steps
+            base_buffer[][][]
+            
+            istinct is to go in the first and see what there is -> raw path - path buffer
+            --> [1][1][1][1]
+            and also in the second -> append 
+            --> [1][1][1][1][2][2][2] 
+            and third also because is the last -> append
+            --> [1][1][1][1][2][2][2][3][3]
+      
+      	    and keep the lengths
+            len = 4,3,2
+            
+            now path buffer can stay in memory...
+            
+            then we open all and append everything, there are lengths
+            [1][1][1][1][2][2][2][3][3] [1-1][1-1] [1-2][1-2][1-2] [2-1][2-1] [2-2] [2-3][2-3] [3-1][3-1] [3-2][3-2]
+            len = 4,3,2, 2,3 2,1,2 2,2
+            
+            now the first layer is unpackaged.. 
+            then we need a stack for layers
+            layers = [ 4+3+2 ] [2+3+2+1+2+2+2]
+	
+	   we keep sum of len as the other begin for now
+	   the_middle_begin = layers length - 1 [] 
+	   
+	    ____________________________________________________
+	   
+	    [1][1][1][1][2][2][2][3][3] [1-1][1-1] [1-2][1-2][1-2] [2-1][2-1] [2-2] [2-3][2-3] [3-1][3-1] [3-2][3-2]
+            len = 4,3,2, 2,3 2,1,2 2,2
+            ____________________________________________________
+            
+            len can become new..
+            
+            [1][1][1][1][2][2][2][3][3] [1-1][1-1] [1-2][1-2][1-2] [2-1][2-1] [2-2] [2-3][2-3] [3-1][3-1] [3-2][3-2]
+            
+            len_index = 0
+            len = [0]
+            layers = [ 4+3+2 ] [2+3+2+1+2+2+2]
+            
+            [1][1][1][1][2][2][2][3][3] --- [1-1][1-1] [1-2][1-2][1-2] [2-1][2-1] [2-2] [2-3][2-3] [3-1][3-1] [3-2][3-2] --- [1-1-1][1-1-1] [1-1-2][1-1-2] [1-2-1][1-2-1] [1-2-2][1-2-2] 
+	    
+	    len = 2,2,2,2
+	   
+	    now len can become an integer , a 32bit integer len = is if was 8
+	   
+	    layers = [ 4+3+2 ] [2+3+2+1+2+2+2] [8 or more]
+	
+	    if in the second [1-1-1] there is a data and not a node, will be just deleted, length does not increase and the content is not appended,
+	    
+	    even layers can be a constant lenght and have only last layer [begin][end]
+	    
+	    THERE IS A SUSTAINABLE WAY TO NOT MULTIPLICATE VARIABLES HARDCODING WIT GERMAN KEYBOARD IGNORING CTRL KEY, BECAUSE ALMOST ALL THE PEOPLE LIVING NEAR OR IN AMSTERDAM IS VERY JEALOUS ABOUT SOMEONE DOIYNG PART TIME JOB AND NOT GETTING THE UNIVERSITY AND OR HOME PAYED FROM THE PARENTS, WITH HOUSEMATES MAKING PROFILES FOR YOU, WAKING UP IN THE NIGHT, SPEAKING INDIRECTLY OR SHOUTING OPINIONS FROM OUTSIDE THEYR OWN HOME, AND HAVING LUCK WITH YOUR MONEY AND THE POSSIBLE DUTCH TRANSITION FROM PART TO FULL TIME:  AND INSTEAD OF THAT JUST UNPACKAGE THE LAST LAYER, MEANWHILE DELETE ALL WHAT IS NOT A NODE, AND THEN FROM THE END OF THE ARRAY DROP ALL THE NODES IN GARBAGE?
+	    
+	    let me know with the next answer to my job application in IT
+	    there are still more than 100 000 vacancies and machine learning is not jet running after it quick enought.
+	    
+	    cäplsm makes freedom
+  	    layers make protections
+            
+            */
         break;
 
         default:
