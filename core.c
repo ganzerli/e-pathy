@@ -201,11 +201,11 @@ u32 add_node_or_data_to(u32* filebuffer , u32 path_begin , u32 new_node_or_data)
                     printf("[%u] now is -> %u\n",i, filebuffer[i] );
                     // set position of new node in this [END]  ...[END p*]
                     filebuffer[available_memory_at] = new_node_or_data;             // [END *p]---..''-->[p*] = new_node or data 
-                    limit ++;                                                       // update int32count
+                    limit ++;                                                       // update int32count: needed consideration with memory found
                     printf(" new_node_or_data[%u] written in filebuffer[%u]\n", new_node_or_data, (available_memory_at) );
                     // add END_SKELETON right after that
                     filebuffer[available_memory_at +1] = END_SKELETON;              // [END *p]---..''-->[p*][END]
-                    limit ++;                                                       // update int32count
+                    limit ++;                                                       // update int32count: needed consideration with memory found
                     printf(" [END_SKELETON] written in filebuffer[%u]\n", (available_memory_at+1) );
                     stop = 1;                                                       // exit the loop
                     break;
