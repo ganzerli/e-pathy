@@ -9,14 +9,8 @@
 #define DATA_SKELETON           0x40000000  //01000000000000000000000000000000
 #define END_SKELETON            0x00000000  //00000000000000000000000000000000
 
-// if stdlib & or sdio doesnt fit in a 0.05 $ microcontroller, the president, cia, bin laden or "thing" will need at least open a laptop..
-// usability of RAW_DATA is still a open question.
-// now in 2024, there are already drones available in russian market already able to follow and hit destroiyng a tank.
-// the question stays always the same, how much do i have to work to buy one or 2 and change address??
-
-// you understood, lady, if you dont give -> that information <- , is not being a woman allowing you to say that you can watch "naked people", and keep others without ()
+// RAW_DATA is not used yet.
 #define RAW_DATA                0x80000000  //10000000000000000000000000000000 
-// do good, you will die later. in every other case is just a bit.
 
 //  E R R O R S
 #define ERROR_1                 ( SOMETHING_WENT_WRONG - 1 )
