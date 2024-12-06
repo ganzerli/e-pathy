@@ -10,7 +10,7 @@
 // format 32 bits into 8 bit int array
 void format_response( char*bf_out, void* bf_in , u32 count ){
     char* res_b_in = (char*) bf_in;                         // cast and reassign the input buffer
-    for( u32 i = 0; i < count; i++; ){
+    for( u32 i = 0; i < count; i++ ){
         bf_out[i] = res_b_in[i];                            // copy every byte in a response buffer
     }
 }
@@ -193,7 +193,7 @@ unsigned int execute_instruction( char* buffer , unsigned int size ){
         break;
 
         default:
-            path_buffer[0] = [0];
+            path_buffer[0] = (u32)0;
             format_response( buffer , path_buffer , 4 );        // first word in the relacy file as response, error is not implemented jet
         break;
     }
